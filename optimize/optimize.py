@@ -10,8 +10,8 @@ from optimize.constraints import set_constraints
 from optimize.objective_function import create_objective_function
 from optimize.variables import create_variables_and_set_on_solver
 
-TERMINAL_COST = 100003
-FULL_ORDER = 8641
+TERMINAL_COST = 10000
+FULL_ORDER = 864
 
 
 def start_optimize(
