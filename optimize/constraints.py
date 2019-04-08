@@ -37,6 +37,28 @@ def set_constraints(
         product_specs=product_specs,
     )
 
+#Time Constraint
+def _set_time_constraint(
+        x_vars: List[Variable],
+        z_vars: List[Variable],
+        vendors: List[Vendor],
+        product_specs: List[ProductSpec],
+        customers: List[Customer],
+        solver,
+):
+    #Cannot send fish that arrives after departure day
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+
+                    constraint_time = solver.Constraint(-solver.infinity(), 0)
+                    for p, product in enumerate(product_specs):
+
+                        constraint_time.SetCoefficient(x_vars[v][d][c][o][p], 1)
+                        constraint_time.SetCoefficient(z_vars[v][d][c][o], -M)
+
+
 
 def _set_supply_and_demand_constraints(
         y_vars: List[Variable],
