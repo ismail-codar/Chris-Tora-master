@@ -40,7 +40,7 @@ def _load_test_vendors():
         transportation_cost_per_box=0.5,
     )
     delivery_2_vendor_1 = Delivery(
-        delivery_day=0,
+        delivery_day=4,
         products=[
             Product(
                 product_type=ProductType.SALMON_1_2,
@@ -65,7 +65,7 @@ def _load_test_vendors():
     )
 
     delivery_1_vendor_2 = Delivery(
-        delivery_day=1,
+        delivery_day=4,
         products=[
             Product(
                 product_type=ProductType.SALMON_2_3,

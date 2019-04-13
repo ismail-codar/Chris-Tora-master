@@ -10,7 +10,7 @@ from optimize.variables import Variables
 
 
 M = 1000000
-
+FULL_ORDER = 864
 
 def set_constraints(
         vendors: List[Vendor],
@@ -36,27 +36,66 @@ def set_constraints(
         vendors=vendors,
         product_specs=product_specs,
     )
+    _set_cross_docking_constraint(
+        x_vars=variables.x,
+        d_vars=variables.d,
+        vendors=vendors,
+        product_specs=product_specs,
+        customers=customers,
+        solver=solver,
+    )
 
-#Time Constraint
-def _set_time_constraint(
+#Cross-Docking Constraint
+def _set_cross_docking_constraint(
         x_vars: List[Variable],
-        z_vars: List[Variable],
+        d_vars: List[Variable],
         vendors: List[Vendor],
         product_specs: List[ProductSpec],
         customers: List[Customer],
         solver,
 ):
-    #Cannot send fish that arrives after departure day
     for v, vendor in enumerate(vendors):
         for d, delivery in enumerate(vendor.deliveries):
             for c, customer in enumerate(customers):
                 for o, order in enumerate(customer.orders):
 
-                    constraint_time = solver.Constraint(-solver.infinity(), 0)
-                    for p, product in enumerate(product_specs):
+                    constraint_cross_docking = solver.Constraint(-solver.infinity(), FULL_ORDER)
+                    constraint_cross_docking.SetCoefficient(d_vars[o], -M)
 
-                        constraint_time.SetCoefficient(x_vars[v][d][c][o][p], 1)
-                        constraint_time.SetCoefficient(z_vars[v][d][c][o], -M)
+                    for p, product in enumerate(product_specs):
+                        constraint_cross_docking.SetCoefficient(x_vars[v][d][c][o][p],1)
+
+#Time Constraint
+#def _set_time_constraints(
+#        x_vars: List[Variable],
+#        z_vars: List[Variable],
+#        vendors: List[Vendor],
+#        product_specs: List[ProductSpec],
+#        customers: List[Customer],
+#        solver,
+#):
+#    #Cannot send fish that arrives after departure day
+#    for v, vendor in enumerate(vendors):
+#        for d, delivery in enumerate(vendor.deliveries):
+#            for c, customer in enumerate(customers):
+#                for o, order in enumerate(customer.orders):
+
+#                    constraint_time = solver.Constraint(-solver.infinity(), 0)
+#                    constraint_time.SetCoefficient(z_vars[v][d][c][o], -M)
+#
+#                    for p, product in enumerate(product_specs):
+
+#                   constraint_time.SetCoefficient(x_vars[v][d][c][o][p], 1)
+
+#   for v, vendor in enumerate(vendors):
+#        for d, delivery in enumerate(vendor.deliveries):
+#            for c, customer in enumerate(customers):
+#                for o, order in enumerate(customer.orders):
+
+#                    departure_day_order_o = return order.departure_day
+
+#                   constraint_time_pt2 = solver.Constraint(0, departure_day_order_o-arrival_day_delivery_d+M)
+#                    constraint_time_pt2.SetCoefficient(z_vars [v][d][c][o], M)
 
 
 
@@ -120,8 +159,48 @@ def _product_list_contains_product_p(product_type: ProductType, products: List[P
             return True
     return False
 
+def _set_contract_customer_constraints(
+        x_vars,
+        y_vars,
+        customers: List[Customer],
+        solver,
+        vendors: List[Vendor],
+        product_specs: List[ProductSpec]
+):
+    for c_c, customer_c in enumerate(customers):
+        if customer_c.customer_category == CustomerCategory.Contract:
+            for o_c, order_c in enumerate(customer_c.orders):
+                for p, product in enumerate(product_specs):
 
-def _set_a_customer_constraints(x_vars, y_vars, t_vars, customers: List[Customer], solver, vendors: List[Vendor], product_specs: List[ProductSpec]):
+                    if _product_list_contains_product_p(
+                        product_type=product.product_type,
+                        products=order_c.demand
+                    ):
+                        demand = _get_volume_for_product_p(
+                            product_type=product.product_type,
+                            product_list=order_c.demand
+                        )
+
+                    else:
+                        demand = 0
+
+                    constraint_contract_customer = solver.Constraint(demand, solver.infinity())
+
+                    constraint_contract_customer.SetCoefficient(y_vars[c_c][o_c][p], 1)
+
+                    for v, vendor in enumerate(vendors):
+                            for d, delivery in enumerate(vendor.deliveries):
+                                constraint_contract_customer.SetCoefficient(x_vars[v][d][c_c][o_c][p], 1)
+
+def _set_a_customer_constraints(
+        x_vars,
+        y_vars,
+        t_vars,
+        customers: List[Customer],
+        solver,
+        vendors: List[Vendor],
+        product_specs: List[ProductSpec]
+):
     for c_a, customer_a in enumerate(customers):
         if customer_a.customer_category == CustomerCategory.A:
             for o_a, order_a in enumerate(customer_a.orders):
