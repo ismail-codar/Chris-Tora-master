@@ -52,3 +52,22 @@ def _order_has_product_p(product_type: ProductType, products: List[Product]):
         if product.product_type == product_type:
             return True
     return False
+
+def _set_transportation_to_customer_objective(customers, product_specs, vendors, objective, x_vars, y_vars):
+    for c, customer in enumerate(customers):
+        for o, order in enumerate(customer.orders):
+            for p, product in enumerate(product_specs):
+
+                if _order_has_product_p(product_type=product.product_type, products=order.demand):
+                    transport_price = _get_transport_price_for_order_o(product_type=product.product_type, products=order.demand)
+                    objective.SetCoefficient(y_vars[c][o][p], transport_price)
+
+                    for v, vendor in enumerate(vendors):
+                        for d, delivery in enumerate(vendor.deliveries):
+                            objective.SetCoefficient(x_vars[v][d][c][o][p], transport_price)
+
+def _get_transport_price_for_order_o(product_type: ProductType, products: List[Product]):
+    for product in products:
+        if product.product_type == product_type:
+            transport_price = customer.transportation_price_per_box
+            return transport_price
