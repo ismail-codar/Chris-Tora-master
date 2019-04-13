@@ -22,6 +22,14 @@ def create_objective_function(
         x_vars=variables.x,
         y_vars=variables.y,
     )
+    _set_transportation_to_customer_objective(
+        customers=customers,
+        product_specs=product_specs,
+        vendors=vendors,
+        objective=objective,
+        x_vars=variables.x,
+        y_vars=variables.y,
+    )
 
     return objective
 
@@ -71,3 +79,18 @@ def _get_transport_price_for_order_o(product_type: ProductType, products: List[P
         if product.product_type == product_type:
             transport_price = customer.transportation_price_per_box
             return transport_price
+
+def _set_purchase_cost_extra_purchase_objective(customers, product_specs, objective, y_vars):
+    for c, customer in enumerate(customers):
+        for o, order in enumerate (customer.orders):
+            for p, product in enumerate (product_specs):
+
+                if _order_has_product_p(product_type=product.product_type, products=order.demand):
+                    extra_price = _get_extra_purchase_price_for_product_p(product_type=product.product_type, products=order.demand)
+                    objective.SetCoefficient(y_vars[c][o][p], extra_price)
+
+def _get_extra_purchase_price_for_product_p(product_type: ProductType, products: List[Product]):
+    for product in products:
+        if product.product_type == product_type:
+            extra_price = ProductSpec.extra_cost
+            return extra_price
