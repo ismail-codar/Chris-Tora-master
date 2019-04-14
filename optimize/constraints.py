@@ -53,6 +53,14 @@ def set_constraints(
         customers=customers,
         solver=solver,
     )
+    _set_contract_customer_constraints(
+        x_vars=variables.x,
+        y_vars=variables.y,
+        customers=customers,
+        solver=solver,
+        vendors=vendors,
+        product_specs=product_specs,
+    )
 
 
 # Cross-Docking Constraint

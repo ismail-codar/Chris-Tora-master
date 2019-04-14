@@ -33,7 +33,7 @@ def _load_test_vendors():
             ),
             Product(
                 product_type=ProductType.SALMON_1_2,
-                volume=5,
+                volume=864,
                 price=60.0
             )
         ],
