@@ -14,6 +14,7 @@ class Variables:
     t: list
     d: list
     y: list
+    o: list
 
 
 def create_variables_and_set_on_solver(
@@ -34,6 +35,7 @@ def create_variables_and_set_on_solver(
         product_specs=product_specs,
     )
     d_vars = _create_d_vars(
+        vendors=vendors,
         customers=customers,
         solver=solver,
     )
@@ -42,6 +44,11 @@ def create_variables_and_set_on_solver(
         solver=solver,
         product_specs=product_specs,
     )
+    o_vars = _create_o_vars(
+        vendors=vendors,
+        customers=customers,
+        solver=solver,
+    )
 
     variables = Variables(
         x=x_vars,
@@ -49,8 +56,31 @@ def create_variables_and_set_on_solver(
         t=t_vars,
         d=d_vars,
         y=y_vars,
+        o=o_vars,
     )
     return variables
+
+
+# o = 1 if order goes via Oslo
+def _create_o_vars(vendors: List[Vendor], customers: List[Customer], solver):
+    o_vars = [
+        [
+            [
+                [
+                    solver.NumVar(
+                        lb=0,
+                        ub=solver.infinity(),
+                        name="o_v:" + vendor.id + "_d:" + str(delivery_index) + "_c:" + customer.id + "_o:" + str(order.order_number)
+                    )
+                    for order in customer.orders
+                ]
+                for customer in customers
+            ]
+            for delivery_index, delivery in enumerate(vendor.deliveries)
+        ]
+        for vendor in vendors
+    ]
+    return o_vars
 
 
 # t = 1 if B-order is allowed to get any boxes
@@ -76,18 +106,21 @@ def _create_t_vars (
 
 
 # d = 1 if the order is sent directly to the customer
-def _create_d_vars (
-    customers: List[Customer],
-    solver
-):
+def _create_d_vars(vendors: List[Vendor], customers: List[Customer], solver):
     d_vars = [
         [
-            solver.BoolVar(
-                name="d_c:" + customer.id + "_o:" + str(order.order_number)
-            )
-            for order in customer.orders
+            [
+                [
+                    solver.BoolVar(
+                        name="d_v:" + vendor.id + "_d:" + str(delivery_index) + "_c:" + customer.id + "_o:" + str(order.order_number)
+                    )
+                    for order in customer.orders
+                ]
+                for customer in customers
+            ]
+            for delivery_index, delivery in enumerate(vendor.deliveries)
         ]
-        for customer in customers
+        for vendor in vendors
     ]
     return d_vars
 

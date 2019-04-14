@@ -5,16 +5,22 @@ from input_data.products import ProductType, Product
 
 
 @dataclass(frozen=True)
+class TransportationCost:
+    product_type: ProductType
+    cost: float
+
+
+@dataclass(frozen=True)
 class Delivery:
     delivery_day: int
     products: List[Product]
-    transportation_cost_per_box: float
 
 
 @dataclass(frozen=True)
 class Vendor:
     id: str
     deliveries: List[Delivery]
+    transportation_cost_per_box: List[TransportationCost]
 
 
 def load_vendors():
@@ -27,23 +33,27 @@ def _load_test_vendors():
         delivery_day=4,
         products=[
             Product(
-                product_type=ProductType.SALMON_2_3,
-                volume=4,
-                price=58.9
-            ),
-            Product(
                 product_type=ProductType.SALMON_1_2,
                 volume=864,
                 price=60.0
             )
         ],
-        transportation_cost_per_box=0.5,
     )
 
     vendor_1 = Vendor(
         id="vendor_1",
         deliveries=[
             delivery_1_vendor_1,
+        ],
+        transportation_cost_per_box=[
+            TransportationCost(
+                ProductType.SALMON_1_2,
+                cost=2,
+            ),
+            TransportationCost(
+                ProductType.SALMON_2_3,
+                cost=3,
+            )
         ]
     )
 
@@ -56,13 +66,22 @@ def _load_test_vendors():
                 price=58.5,
             )
         ],
-        transportation_cost_per_box=0.5,
     )
 
     vendor_2 = Vendor(
         id="vendor_2",
         deliveries=[
             delivery_1_vendor_2,
+        ],
+        transportation_cost_per_box=[
+            TransportationCost(
+                ProductType.SALMON_1_2,
+                cost=2,
+            ),
+            TransportationCost(
+                ProductType.SALMON_2_3,
+                cost=3,
+            )
         ]
     )
 

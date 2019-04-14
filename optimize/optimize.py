@@ -106,3 +106,8 @@ def _print_solution_statistic(
         for o, order in enumerate(customer.orders):
             if variables.d[c][o].solution_value() > 0:
                 print("d(c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[c][o].solution_value()))
+
+    for c, customer in enumerate(customers):
+        for o, order in enumerate(customer.orders):
+            if variables.o[c][o].solution_value() > 0:
+                print("o(c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[c][o].solution_value()))

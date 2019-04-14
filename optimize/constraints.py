@@ -4,14 +4,14 @@ from ortools.linear_solver.pywraplp import Variable
 
 from input_data.customer_category import CustomerCategory
 from input_data.load_customers import Customer
-from input_data.load_vendors import Vendor
+from input_data.load_vendors import Vendor, TransportationCost
 from input_data.products import ProductSpec, ProductType, Product
 from optimize.variables import Variables
 
 
 M = 1000000
 QUANTITY_FULL_ORDER = 864
-
+TERMINAL_COST=10
 
 def set_constraints(
         vendors: List[Vendor],
@@ -44,6 +44,7 @@ def set_constraints(
         product_specs=product_specs,
         customers=customers,
         solver=solver,
+        o_vars=variables.o,
     )
     _set_time_constraints(
         x_vars=variables.x,
@@ -62,7 +63,6 @@ def set_constraints(
         product_specs=product_specs,
     )
 
-
 # Cross-Docking Constraint
 def _set_cross_docking_constraint(
         x_vars: List[Variable],
@@ -71,17 +71,43 @@ def _set_cross_docking_constraint(
         product_specs: List[ProductSpec],
         customers: List[Customer],
         solver,
+        o_vars: List[Variable],
 ):
     for v, vendor in enumerate(vendors):
         for d, delivery in enumerate(vendor.deliveries):
             for c, customer in enumerate(customers):
                 for o, order in enumerate(customer.orders):
 
-                    constraint_cross_docking = solver.Constraint(-solver.infinity(), QUANTITY_FULL_ORDER)
-                    constraint_cross_docking.SetCoefficient(d_vars[c][o], -M)
+                    constraint_cross_docking = solver.Constraint(QUANTITY_FULL_ORDER, solver.infinity())
+                    constraint_cross_docking.SetCoefficient(d_vars[v][d][c][o], M)
 
                     for p, product in enumerate(product_specs):
                         constraint_cross_docking.SetCoefficient(x_vars[v][d][c][o][p], 1)
+
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+
+                    constraint_via_oslo = solver.Constraint(-M, solver.infinity())
+                    constraint_via_oslo.SetCoefficient(o_vars[v][d][c][o], 1)
+                    constraint_via_oslo.SetCoefficient(d_vars[v][d][c][o], -M)
+
+                    for p, product in enumerate(product_specs):
+
+                        transportation_cost = _get_transport_price_from_vendor_v(
+                            product_type=product.product_type,
+                            transportation_price_per_box=vendor.transportation_cost_per_box,
+                            vendor_id=vendor.id
+                        )
+                        constraint_via_oslo.SetCoefficient(x_vars[v][d][c][o][p], -(transportation_cost+TERMINAL_COST))
+
+
+def _get_transport_price_from_vendor_v(product_type: ProductType, transportation_price_per_box: List[TransportationCost], vendor_id: str):
+    for transportation_price in transportation_price_per_box:
+        if transportation_price.product_type == product_type:
+            return transportation_price.cost
+    raise Exception("Not able to access transportation price for product type " + str(product_type.name) + " for vendor " + vendor_id)
 
 
 # Time Constraint

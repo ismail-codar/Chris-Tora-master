@@ -30,8 +30,28 @@ def create_objective_function(
         x_vars=variables.x,
         y_vars=variables.y,
     )
+    _set_cross_docking_objective(
+        customers=customers,
+        vendors=vendors,
+        o_vars=variables.o,
+        objective=objective,
+    )
+    _set_purchase_cost_extra_purchase_objective(
+        customers=customers,
+        product_specs=product_specs,
+        objective=objective,
+        y_vars=variables.y,
+    )
 
     return objective
+
+
+def _set_cross_docking_objective(customers, vendors,  o_vars, objective):
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+                    objective.SetCoefficient(o_vars[v][d][c][o], 1)
 
 
 def _set_revenue_objective(customers, product_specs, vendors, objective, x_vars, y_vars):

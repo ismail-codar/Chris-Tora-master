@@ -43,12 +43,12 @@ def load_product_spec():
         ProductSpec(
             product_type=ProductType.SALMON_1_2,
             customs_cost=20.0,
-            extra_cost=80.0,
+            extra_cost=1000.0,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_2_3,
             customs_cost=20.0,
-            extra_cost=80.0,
+            extra_cost=1000.0,
         ),
         # ProductSpec(
         #     product_type=ProductType.SALMON_3_4,
