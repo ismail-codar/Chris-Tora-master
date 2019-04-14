@@ -51,7 +51,7 @@ def _set_cross_docking_objective(customers, vendors,  o_vars, objective):
         for d, delivery in enumerate(vendor.deliveries):
             for c, customer in enumerate(customers):
                 for o, order in enumerate(customer.orders):
-                    objective.SetCoefficient(o_vars[v][d][c][o], 1)
+                    objective.SetCoefficient(o_vars[v][d][c][o], -1)
 
 
 def _set_revenue_objective(customers, product_specs, vendors, objective, x_vars, y_vars):
@@ -107,7 +107,7 @@ def _get_transport_price_for_customer_c(product_type: ProductType, transportatio
 
 
 def _set_purchase_cost_extra_purchase_objective(customers, product_specs: List[ProductSpec], objective, y_vars):
-    for p, product in enumerate (product_specs):
+    for p, product in enumerate(product_specs):
         extra_price = _get_extra_purchase_price_for_product_p(product_type=product.product_type, product_specs=product_specs)
         for c, customer in enumerate(customers):
             for o, order in enumerate(customer.orders):

@@ -102,12 +102,16 @@ def _print_solution_statistic(
     #                     print("t(c" + str(c + 1) + "_o" + str(o + 1) + "_p" + str(p + 1) + "): " + str(variables.t[c][o][p].solution_value()))
     #         b_customer_index += 1
 
-    for c, customer in enumerate(customers):
-        for o, order in enumerate(customer.orders):
-            if variables.d[c][o].solution_value() > 0:
-                print("d(c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[c][o].solution_value()))
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+                    if variables.d[v][d][c][o].solution_value() > -10:
+                        print("d(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[v][d][c][o].solution_value()))
 
-    for c, customer in enumerate(customers):
-        for o, order in enumerate(customer.orders):
-            if variables.o[c][o].solution_value() > 0:
-                print("o(c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[c][o].solution_value()))
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+                    if variables.o[v][d][c][o].solution_value() > -1:
+                        print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[v][d][c][o].solution_value()))
