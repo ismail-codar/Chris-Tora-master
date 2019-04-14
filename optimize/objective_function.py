@@ -14,7 +14,7 @@ def create_objective_function(
 ):
     objective = solver.Objective()
 
-    _set_revenue_objective(
+    objective = _set_revenue_objective(
         customers=customers,
         product_specs=product_specs,
         vendors=vendors,
@@ -30,20 +30,42 @@ def create_objective_function(
         x_vars=variables.x,
         y_vars=variables.y,
     )
-    _set_cross_docking_objective(
-        customers=customers,
-        vendors=vendors,
-        o_vars=variables.o,
-        objective=objective,
-    )
-    _set_purchase_cost_extra_purchase_objective(
-        customers=customers,
-        product_specs=product_specs,
-        objective=objective,
-        y_vars=variables.y,
-    )
+    # _set_cross_docking_objective(
+    #     customers=customers,
+    #     vendors=vendors,
+    #     o_vars=variables.o,
+    #     objective=objective,
+    # )
+    # _set_purchase_cost_extra_purchase_objective(
+    #     customers=customers,
+    #     product_specs=product_specs,
+    #     objective=objective,
+    #     y_vars=variables.y,
+    # )
+    # _set_customs_objective(
+    #     customers=customers,
+    #     product_specs=product_specs,
+    #     objective=objective,
+    #     y_vars=variables.y,
+    #     x_vars=variables.x,
+    #     vendors=vendors,
+    # )
 
     return objective
+
+
+def _set_customs_objective(customers, vendors, product_specs: List[ProductSpec], x_vars, y_vars, objective):
+    for c, customer in enumerate(customers):
+        if customer.out_of_country:
+            for o, order in enumerate(customer.orders):
+                for p, product_spec in enumerate(product_specs):
+
+                    objective.SetCoefficient(y_vars[c][o][p],-product_spec.customs_cost)
+
+                    for v, vendor in enumerate(vendors):
+                        for d, delivery in enumerate(vendor.deliveries):
+
+                            objective.SetCoefficient(x_vars[v][d][c][o][p], -product_spec.customs_cost)
 
 
 def _set_cross_docking_objective(customers, vendors,  o_vars, objective):
@@ -66,6 +88,7 @@ def _set_revenue_objective(customers, product_specs, vendors, objective, x_vars,
                     for v, vendor in enumerate(vendors):
                         for d, delivery in enumerate(vendor.deliveries):
                             objective.SetCoefficient(x_vars[v][d][c][o][p], price)
+    return objective
 
 
 def _get_price_for_product_p(product_type: ProductType, products: List[Product]):
