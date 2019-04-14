@@ -70,7 +70,7 @@ def _set_cross_docking_constraint(
                 for o, order in enumerate(customer.orders):
 
                     constraint_cross_docking = solver.Constraint(-solver.infinity(), QUANTITY_FULL_ORDER)
-                    constraint_cross_docking.SetCoefficient(d_vars[o], -M)
+                    constraint_cross_docking.SetCoefficient(d_vars[c][o], -M)
 
                     for p, product in enumerate(product_specs):
                         constraint_cross_docking.SetCoefficient(x_vars[v][d][c][o][p], 1)

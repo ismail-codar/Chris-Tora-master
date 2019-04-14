@@ -24,7 +24,7 @@ def load_vendors():
 
 def _load_test_vendors():
     delivery_1_vendor_1 = Delivery(
-        delivery_day=-4,
+        delivery_day=4,
         products=[
             Product(
                 product_type=ProductType.SALMON_2_3,
