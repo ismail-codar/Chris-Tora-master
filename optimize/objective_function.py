@@ -102,6 +102,7 @@ def _get_price_for_product_p(product_type: ProductType, products: List[Product])
         if product.product_type == product_type:
             price = product.price
             return price
+    raise Exception("Not able to access price for product type " + str(product_type.name))
 
 
 def _order_has_product_p(product_type: ProductType, products: List[Product]):
@@ -130,3 +131,5 @@ def _get_extra_purchase_price_for_product_p(product_type: ProductType, product_s
         if product_spec.product_type == product_type:
             extra_price = product_spec.extra_cost
             return extra_price
+    raise Exception("Not able to access extra purchase price for product type " + str(product_type.name))
+
