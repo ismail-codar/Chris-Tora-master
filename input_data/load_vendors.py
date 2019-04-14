@@ -32,25 +32,9 @@ def _load_test_vendors():
                 price=58.9
             ),
             Product(
-                product_type=ProductType.SALMON_3_4,
+                product_type=ProductType.SALMON_1_2,
                 volume=5,
                 price=60.0
-            )
-        ],
-        transportation_cost_per_box=0.5,
-    )
-    delivery_2_vendor_1 = Delivery(
-        delivery_day=4,
-        products=[
-            Product(
-                product_type=ProductType.SALMON_1_2,
-                volume=2,
-                price=49.6
-            ),
-            Product(
-                product_type=ProductType.SALMON_2_3,
-                volume=4,
-                price=63.2
             )
         ],
         transportation_cost_per_box=0.5,
@@ -60,7 +44,6 @@ def _load_test_vendors():
         id="vendor_1",
         deliveries=[
             delivery_1_vendor_1,
-            delivery_2_vendor_1,
         ]
     )
 
@@ -75,28 +58,11 @@ def _load_test_vendors():
         ],
         transportation_cost_per_box=0.5,
     )
-    delivery_2_vendor_2 = Delivery(
-        delivery_day=4,
-        products=[
-            Product(
-                product_type=ProductType.SALMON_3_4,
-                volume=2,
-                price=48.5
-            ),
-            Product(
-                product_type=ProductType.SALMON_2_3,
-                volume=5,
-                price=26.78,
-            )
-        ],
-        transportation_cost_per_box=0.5,
-    )
 
     vendor_2 = Vendor(
         id="vendor_2",
         deliveries=[
             delivery_1_vendor_2,
-            delivery_2_vendor_2,
         ]
     )
 

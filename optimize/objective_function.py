@@ -69,6 +69,7 @@ def _set_transportation_to_customer_objective(customers, product_specs, vendors,
             transport_price = _get_transport_price_for_customer_c(
                 product_type=product.product_type,
                 transportation_price_per_box=customer.transportation_price_per_box,
+                customer_id=customer.id
             )
             for o, order in enumerate(customer.orders):
                 objective.SetCoefficient(y_vars[c][o][p], - transport_price)
@@ -78,10 +79,11 @@ def _set_transportation_to_customer_objective(customers, product_specs, vendors,
                         objective.SetCoefficient(x_vars[v][d][c][o][p], - transport_price)
 
 
-def _get_transport_price_for_customer_c(product_type: ProductType, transportation_price_per_box: List[TransportationCost]):
+def _get_transport_price_for_customer_c(product_type: ProductType, transportation_price_per_box: List[TransportationCost], customer_id: str):
     for transportation_price in transportation_price_per_box:
         if transportation_price.product_type == product_type:
             return transportation_price.cost
+    raise Exception("Not able to access transportation price for product type " + str(product_type.name) + " for customer " + customer_id)
 
 
 def _set_purchase_cost_extra_purchase_objective(customers, product_specs: List[ProductSpec], objective, y_vars):

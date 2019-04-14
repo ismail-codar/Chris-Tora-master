@@ -93,7 +93,7 @@ def _create_d_vars (
 
 
 # flow of extra delivery
-def _create_y_vars (
+def _create_y_vars(
     customers: List[Customer],
     solver,
     product_specs: List[ProductSpec]
