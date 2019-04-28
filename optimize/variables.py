@@ -61,7 +61,7 @@ def create_variables_and_set_on_solver(
     return variables
 
 
-# o = 1 if order goes via Oslo
+# o oslo cost
 def _create_o_vars(vendors: List[Vendor], customers: List[Customer], solver):
     o_vars = [
         [
