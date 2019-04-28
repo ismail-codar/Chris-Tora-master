@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from typing import List
 
@@ -14,6 +15,7 @@ class TransportationCost:
 class Delivery:
     delivery_day: int
     products: List[Product]
+    id: str
 
 
 @dataclass(frozen=True)
@@ -30,14 +32,20 @@ def load_vendors():
 
 def _load_test_vendors():
     delivery_1_vendor_1 = Delivery(
-        delivery_day=4,
+        delivery_day=1,
         products=[
             Product(
                 product_type=ProductType.SALMON_1_2,
                 volume=864,
                 price=60.0
+            ),
+            Product(
+                product_type=ProductType.SALMON_2_3,
+                volume=864,
+                price=60.0
             )
         ],
+        id=str(uuid.uuid4())
     )
 
     vendor_1 = Vendor(
@@ -58,7 +66,7 @@ def _load_test_vendors():
     )
 
     delivery_1_vendor_2 = Delivery(
-        delivery_day=4,
+        delivery_day=1,
         products=[
             Product(
                 product_type=ProductType.SALMON_2_3,
@@ -66,6 +74,7 @@ def _load_test_vendors():
                 price=58.5,
             )
         ],
+        id=str(uuid.uuid4()),
     )
 
     vendor_2 = Vendor(

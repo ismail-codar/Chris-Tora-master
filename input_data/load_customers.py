@@ -46,7 +46,7 @@ class Customer:
 
 
 def load_customers():
-    path = ("../input_data/orders.xlsx")
+    path = "input_data/orders.xlsx"
     workbook = xlrd.open_workbook(path)
     order_sheet = workbook.sheet_by_index(0)
     cell_values_orders = order_sheet._cell_values

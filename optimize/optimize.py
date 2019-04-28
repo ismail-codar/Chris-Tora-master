@@ -1,11 +1,11 @@
-from typing import List
+from dataclasses import dataclass
+from typing import List, Optional
 
-from input_data.customer_category import CustomerCategory
 from input_data.load_customers import Customer
 from input_data.load_vendors import Vendor
 from ortools.linear_solver import pywraplp
 
-from input_data.products import ProductSpec
+from input_data.products import ProductSpec, ProductType
 from optimize.constraints import set_constraints
 from optimize.objective_function import create_objective_function
 from optimize.variables import create_variables_and_set_on_solver
@@ -14,10 +14,22 @@ TERMINAL_COST = 10000
 FULL_ORDER = 864
 
 
+@dataclass(frozen=True)
+class RealizedResult:
+    volume_delivered: int
+    order_nr: str
+    customer_id: str
+    vendor_id: Optional[str]
+    delivery_id: Optional[int]
+    product_type: ProductType
+    internal_delivery: bool
+
+
 def start_optimize(
         vendors: List[Vendor],
         customers: List[Customer],
-        product_specs: List[ProductSpec]
+        product_specs: List[ProductSpec],
+        start_day: int,
 ):
     solver = pywraplp.Solver(
         "SolveIntegerProblem", pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING
@@ -56,6 +68,14 @@ def start_optimize(
         product_specs=product_specs,
         solver=solver,
     )
+    realized_results = _get_realized_result(
+        variables=variables,
+        start_day=start_day,
+        customers=customers,
+        vendors=vendors,
+        product_specs=product_specs,
+    )
+    return realized_results
 
 
 def _verify_solution(result_status, solver):
@@ -68,6 +88,48 @@ def _verify_solution(result_status, solver):
             print("Using incumbent solution.")
         else:
             raise Exception("Could not find a feasible solution")
+
+
+def _get_realized_result(
+        variables,
+        start_day,
+        customers,
+        vendors,
+        product_specs,
+):
+    realized_results = []
+    for v, vendor in enumerate(vendors):
+        for d, delivery in enumerate(vendor.deliveries):
+            for c, customer in enumerate(customers):
+                for o, order in enumerate(customer.orders):
+                    for p, product in enumerate(product_specs):
+                        if variables.x[v][d][c][o][p].solution_value() > 0 and order.departure_day == start_day:
+                            realized_result = RealizedResult(
+                                volume_delivered=variables.x[v][d][c][o][p].solution_value(),
+                                order_nr=order.order_number,
+                                vendor_id=vendor.id,
+                                delivery_id=delivery.id,
+                                product_type=product.product_type,
+                                internal_delivery=True,
+                                customer_id=customer.id,
+                            )
+                            realized_results.append(realized_result)
+
+    for c, customer in enumerate(customers):
+        for o, order in enumerate(customer.orders):
+            for p, product in enumerate(product_specs):
+                if variables.y[c][o][p].solution_value() > 0 and order.departure_day == start_day:
+                    realized_result = RealizedResult(
+                        volume_delivered=variables.x[v][d][c][o][p].solution_value(),
+                        order_nr=order.order_number,
+                        vendor_id=None,
+                        delivery_id=None,
+                        product_type=product.product_type,
+                        internal_delivery=False,
+                        customer_id=customer.id,
+                    )
+                    realized_results.append(realized_result)
+    return realized_results
 
 
 def _print_solution_statistic(

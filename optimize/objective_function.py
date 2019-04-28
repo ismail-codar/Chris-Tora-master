@@ -45,10 +45,10 @@ def _set_x_objective(x_vars, customers: List[Customer], vendors: List[Vendor], p
             for c, customer in enumerate(customers):
                 for o, order in enumerate(customer.orders):
                     for p, product_spec in enumerate(product_specs):
-                        if _order_has_product_p(product_type=product_spec.product_type, products=order.demand) \
+                        if order_has_product_p(product_type=product_spec.product_type, products=order.demand) \
                                 and _delivery_has_product_p(product_type=product_spec.product_type, products=order.demand):
 
-                            sales_price = _get_price_for_product_p(product_type=product_spec.product_type, products=order.demand)
+                            sales_price = get_price_for_product_p(product_type=product_spec.product_type, products=order.demand)
                             transport_cost = _get_transport_price_for_customer_c(
                                 product_type=product_spec.product_type,
                                 transportation_price_per_box=customer.transportation_price_per_box,
@@ -67,14 +67,14 @@ def _set_y_objective(y_vars, customers: List[Customer], product_specs: List[Prod
     for c, customer in enumerate(customers):
         for o, order in enumerate(customer.orders):
             for p, product_spec in enumerate(product_specs):
-                if _order_has_product_p(product_type=product_spec.product_type, products=order.demand):
+                if order_has_product_p(product_type=product_spec.product_type, products=order.demand):
 
                     transport_price = _get_transport_price_for_customer_c(
                         product_type=product_spec.product_type,
                         transportation_price_per_box=customer.transportation_price_per_box,
                         customer_id=customer.id
                     )
-                    price = _get_price_for_product_p(product_type=product_spec.product_type, products=order.demand)
+                    price = get_price_for_product_p(product_type=product_spec.product_type, products=order.demand)
                     extra_cost = _get_extra_purchase_price_for_product_p(
                         product_type=product_spec.product_type,
                         product_specs=product_specs
@@ -97,7 +97,7 @@ def _set_o_objective(customers, vendors, o_vars, objective):
                     objective.SetCoefficient(o_vars[v][d][c][o], -1)
 
 
-def _get_price_for_product_p(product_type: ProductType, products: List[Product]):
+def get_price_for_product_p(product_type: ProductType, products: List[Product]):
     for product in products:
         if product.product_type == product_type:
             price = product.price
@@ -105,7 +105,7 @@ def _get_price_for_product_p(product_type: ProductType, products: List[Product])
     raise Exception("Not able to access price for product type " + str(product_type.name))
 
 
-def _order_has_product_p(product_type: ProductType, products: List[Product]):
+def order_has_product_p(product_type: ProductType, products: List[Product]):
     for product in products:
         if product.product_type == product_type:
             return True

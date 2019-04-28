@@ -1,0 +1,22 @@
+{
+  "results": [
+    {
+      "vendor_id": "vendor_1",
+      "delivery_index": 0,
+      "actual_delivery_volume": 781,
+      "product_type": "SALMON_1_2"
+    },
+    {
+      "vendor_id": "vendor_1",
+      "delivery_index": 0,
+      "actual_delivery_volume": 888,
+      "product_type": "SALMON_2_3"
+    },
+    {
+      "vendor_id": "vendor_2",
+      "delivery_index": 0,
+      "actual_delivery_volume": 2,
+      "product_type": "SALMON_2_3"
+    }
+  ]
+}
