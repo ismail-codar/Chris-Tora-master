@@ -17,22 +17,22 @@ class ProductType(Enum):
 def get_product_type(product_type: str):
     if product_type == "1-2":
         return ProductType.SALMON_1_2
-    if product_type == "2-3 kg":
+    if product_type == "2-3":
         return ProductType.SALMON_2_3
     if product_type == "3-4":
         return ProductType.SALMON_3_4
-    if product_type == "4-5":
-         return ProductType.SALMON_4_5
-    if product_type == "5-6":
-        return ProductType.SALMON_5_6
-    if product_type == "6-7":
-        return ProductType.SALMON_6_7
-    if product_type == "7-8":
-        return ProductType.SALMON_7_8
-    if product_type == "8-9":
-        return ProductType.SALMON_8_9
-    if product_type == "9+":
-        return ProductType.SALMON_9
+    # if product_type == "4-5":
+    #      return ProductType.SALMON_4_5
+    # if product_type == "5-6":
+    #     return ProductType.SALMON_5_6
+    # if product_type == "6-7":
+    #     return ProductType.SALMON_6_7
+    # if product_type == "7-8":
+    #     return ProductType.SALMON_7_8
+    # if product_type == "8-9":
+    #     return ProductType.SALMON_8_9
+    # if product_type == "9+":
+    #     return ProductType.SALMON_9
     else:
         raise Exception("Unknown product type")
 
@@ -63,11 +63,11 @@ def load_product_spec():
             customs_cost=20.0,
             extra_cost=1000.0,
         ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_3_4,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # ),
+        ProductSpec(
+            product_type=ProductType.SALMON_3_4,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        ),
         # ProductSpec(
         #     product_type=ProductType.SALMON_4_5,
         #     customs_cost=20.0,
