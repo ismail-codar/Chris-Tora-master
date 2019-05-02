@@ -16,7 +16,7 @@ AVERAGE_DEVIATION_SALMON_3_4 = 4
 
 def create_scenarios():
     vendor_path = "../input_data/deliveries.xlsx"
-    vendors: List[Vendor] = load_vendors(vendor_path)
+    vendors: List[Vendor] = load_vendors(path=vendor_path, adjust_delivery_estimate=0)
 
     for scenario_number in range(NUMBER_OF_SCENARIOS):
         results = []

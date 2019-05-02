@@ -14,6 +14,8 @@ NUMBER_OF_DAYS_IN_EACH_RUN = 5
 TIME_HORIZON = 15
 START_DAY = 1
 
+ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
+
 
 def start_run():
 
@@ -27,7 +29,10 @@ def start_run():
         profit_for_scenarios = []
 
         for scenario_index, scenario in enumerate(scenarios):
-            vendors = load_vendors("input_data/deliveries.xlsx")
+            vendors = load_vendors(
+                path="input_data/deliveries.xlsx",
+                adjust_delivery_estimate = ADJUST_DELIVERY_ESTIMATE
+            )
             current_start_day = START_DAY
             profit_for_scenario = []
 
@@ -82,7 +87,10 @@ def start_run():
 
 
     else:
-        vendors = load_vendors("input_data/deliveries.xlsx")
+        vendors = load_vendors(
+            path="input_data/deliveries.xlsx",
+            adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
+        )
         start_day = START_DAY
         end_day = start_day + NUMBER_OF_DAYS_IN_EACH_RUN
         vendors_with_relevant_deliveries = _filter_out_deliveries_after_end_time(

@@ -42,7 +42,7 @@ class Vendor:
     transportation_cost_per_box: List[TransportationCost]
 
 
-def load_vendors(path):
+def load_vendors(path: str, adjust_delivery_estimate: float):
     workbook = xlrd.open_workbook(path)
     delivery_sheet = workbook.sheet_by_index(0)
     cell_values_deliveries = delivery_sheet._cell_values
@@ -74,15 +74,26 @@ def load_vendors(path):
     cell_values_vendors = vendor_sheet._cell_values
     del cell_values_vendors[0]
     vendors = [
-        _load_vendor(vendor_row, delivery_lines, transportation_costs)
+        _load_vendor(
+            vendor_row=vendor_row,
+            delivery_lines=delivery_lines,
+            transportation_costs=transportation_costs,
+            adjust_delivery_estimate=adjust_delivery_estimate,
+        )
         for vendor_row in cell_values_vendors
     ]
     return vendors
 
 
-def _load_vendor(vendor_row, delivery_lines: List[DeliveryLineInput], transportation_costs: List[TransportationCostInput]):
+def _load_vendor(
+        vendor_row,
+        delivery_lines: List[DeliveryLineInput],
+        transportation_costs: List[TransportationCostInput],
+        adjust_delivery_estimate: float
+):
     vendor_id = vendor_row[0]
-    deliveries = _get_deliveries_belonging_to_vendor(vendor_id, delivery_lines)
+    deliveries = _get_deliveries_belonging_to_vendor(
+        vendor_id=vendor_id, delivery_lines=delivery_lines, adjust_delivery_estimate=adjust_delivery_estimate)
     transportation_costs_from_vendor = [
         TransportationCost(
             product_type=transportation_cost.product_type,
@@ -99,7 +110,7 @@ def _load_vendor(vendor_row, delivery_lines: List[DeliveryLineInput], transporta
     return vendor
 
 
-def _get_deliveries_belonging_to_vendor(vendor_id, delivery_lines: List[DeliveryLineInput]):
+def _get_deliveries_belonging_to_vendor(vendor_id: str, delivery_lines: List[DeliveryLineInput], adjust_delivery_estimate: float):
     delivery_lines_belonging_to_vendor = [
         delivery_line
         for delivery_line in delivery_lines
@@ -120,17 +131,18 @@ def _get_deliveries_belonging_to_vendor(vendor_id, delivery_lines: List[Delivery
     deliveries = [
         _create_delivery(
             delivery_lines_for_one_delivery_number=delivery_lines_for_delivery_number,
+            adjust_delivery_estimate=adjust_delivery_estimate,
         )
         for delivery_lines_for_delivery_number in delivery_lines_per_delivery_number
     ]
     return deliveries
 
 
-def _create_delivery(delivery_lines_for_one_delivery_number: List[DeliveryLineInput]):
+def _create_delivery(delivery_lines_for_one_delivery_number: List[DeliveryLineInput], adjust_delivery_estimate: float):
     supply = [
         Product(
             product_type=delivery_line.product_type,
-            volume=delivery_line.volume,
+            volume=int(delivery_line.volume * (1 + adjust_delivery_estimate / 100)),
             price=delivery_line.price,
         )
         for delivery_line in delivery_lines_for_one_delivery_number
