@@ -7,7 +7,7 @@ from input_data.load_customers import Customer
 from input_data.load_vendors import Vendor, TransportationCost
 from input_data.products import ProductSpec, ProductType, Product
 from optimize.variables import Variables
-
+from helpers import get_transport_price_from_vendor_v
 
 M = 1000000
 QUANTITY_FULL_ORDER = 864
@@ -95,19 +95,12 @@ def _set_cross_docking_constraint(
 
                     for p, product in enumerate(product_specs):
 
-                        transportation_cost = _get_transport_price_from_vendor_v(
+                        transportation_cost = get_transport_price_from_vendor_v(
                             product_type=product.product_type,
                             transportation_price_per_box=vendor.transportation_cost_per_box,
                             vendor_id=vendor.id
                         )
                         constraint_via_oslo.SetCoefficient(x_vars[v][d][c][o][p], -(transportation_cost+TERMINAL_COST))
-
-
-def _get_transport_price_from_vendor_v(product_type: ProductType, transportation_price_per_box: List[TransportationCost], vendor_id: str):
-    for transportation_price in transportation_price_per_box:
-        if transportation_price.product_type == product_type:
-            return transportation_price.cost
-    raise Exception("Not able to access transportation price for product type " + product_type.name + " for vendor " + vendor_id)
 
 
 # Time Constraint

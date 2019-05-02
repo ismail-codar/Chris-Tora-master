@@ -81,3 +81,17 @@ def get_extra_purchase_price_for_product_p(product_type: ProductType, product_sp
             return extra_price
     raise Exception("Not able to access extra purchase price for product type " + str(product_type.name))
 
+
+def get_customs_costs_for_product_p(product_type: ProductType, product_specs: List[ProductSpec]):
+    for product_spec in product_specs:
+        if product_spec.product_type == product_type:
+            customs_cost = product_spec.customs_cost
+            return customs_cost
+    raise Exception("Not able to access customs cost for product type " + str(product_type.name))
+
+
+def get_transport_price_from_vendor_v(product_type: ProductType, transportation_price_per_box: List[TransportationCost], vendor_id: str):
+    for transportation_price in transportation_price_per_box:
+        if transportation_price.product_type == product_type:
+            return transportation_price.cost
+    raise Exception("Not able to access transportation price for product type " + product_type.name + " for vendor " + vendor_id)
