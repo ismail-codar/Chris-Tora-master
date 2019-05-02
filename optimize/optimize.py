@@ -12,6 +12,7 @@ from optimize.variables import create_variables_and_set_on_solver
 
 TERMINAL_COST = 10000
 FULL_ORDER = 864
+PRINT_VARIABLE_RESULTS = False
 
 
 @dataclass(frozen=True)
@@ -61,13 +62,16 @@ def start_optimize(
     # solver.SetTimeLimit(60000)  # milli sec
     result_status = solver.Solve()
     _verify_solution(result_status, solver)
-    _print_solution_statistic(
-        variables=variables,
-        customers=customers,
-        vendors=vendors,
-        product_specs=product_specs,
-        solver=solver,
-    )
+
+    if PRINT_VARIABLE_RESULTS:
+        _print_solution_statistic(
+            variables=variables,
+            customers=customers,
+            vendors=vendors,
+            product_specs=product_specs,
+            solver=solver,
+        )
+
     actions = _get_actions(
         variables=variables,
         customers=customers,
@@ -80,9 +84,11 @@ def start_optimize(
 def _verify_solution(result_status, solver):
     solution_is_verified = solver.VerifySolution(tolerance=0.001, log_errors=False)
     if result_status == pywraplp.Solver.OPTIMAL and solution_is_verified:
-        print("Optimal solution found.")
+        if PRINT_VARIABLE_RESULTS:
+            print("Optimal solution found.")
     else:
-        print("Optimal solution was not found.")
+        if PRINT_VARIABLE_RESULTS:
+            print("Optimal solution was not found.")
         if solution_is_verified:
             print("Using incumbent solution.")
         else:

@@ -38,7 +38,7 @@ def get_product_type(product_type: str):
         raise Exception(product_type + "is an unknown product type. See file products.py")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Product:
     product_type: ProductType
     volume: int
