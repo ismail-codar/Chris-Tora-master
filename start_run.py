@@ -11,6 +11,7 @@ DETERMINISTIC = True
 SIMULATE_RESULTS = True
 NUMBER_OF_DAYS_IN_EACH_RUN = 5
 TIME_HORIZON = 15
+START_DAY = 1
 
 
 def start_run():
@@ -23,7 +24,7 @@ def start_run():
         scenarios = load_scenarios()
         number_of_runs = TIME_HORIZON - NUMBER_OF_DAYS_IN_EACH_RUN + 1
 
-    start_day = 1
+    start_day = START_DAY
     end_day = start_day + NUMBER_OF_DAYS_IN_EACH_RUN
 
     vendors_with_relevant_deliveries = _filter_out_deliveries_out_of_time_scope(
@@ -36,18 +37,17 @@ def start_run():
         end_day=end_day,
     )
 
-    realized_results = start_optimize(
+    actions = start_optimize(
         vendors=vendors_with_relevant_deliveries,
         customers=customers_with_relevant_orders,
         product_specs=product_specs,
-        start_day=start_day,
     )
 
     profit_for_start_day = calculate_profit_for_start_day(
         vendors=vendors_with_relevant_deliveries,
         customers=customers_with_relevant_orders,
         product_specs=product_specs,
-        realized_results=realized_results,
+        actions=actions,
         start_day=start_day,
     )
     stop = 4
