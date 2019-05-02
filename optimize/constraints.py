@@ -107,7 +107,7 @@ def _get_transport_price_from_vendor_v(product_type: ProductType, transportation
     for transportation_price in transportation_price_per_box:
         if transportation_price.product_type == product_type:
             return transportation_price.cost
-    raise Exception("Not able to access transportation price for product type " + str(product_type.name) + " for vendor " + vendor_id)
+    raise Exception("Not able to access transportation price for product type " + product_type.name + " for vendor " + vendor_id)
 
 
 # Time Constraint
@@ -136,7 +136,7 @@ def _set_time_constraints(
             for c, customer in enumerate(customers):
                 for o, order in enumerate(customer.orders):
 
-                    constraint_time_pt2 = solver.Constraint(0, order.departure_day - delivery.delivery_day + M)
+                    constraint_time_pt2 = solver.Constraint(0, order.departure_day - delivery.arrival_day + M)
                     constraint_time_pt2.SetCoefficient(z_vars[v][d][c][o], M)
 
 
@@ -153,10 +153,10 @@ def _set_supply_and_demand_constraints(
         for d, delivery in enumerate(vendor.deliveries):
             for p, product in enumerate(product_specs):
 
-                if _product_list_contains_product_p(product_type=product.product_type, products=delivery.products):
+                if _product_list_contains_product_p(product_type=product.product_type, products=delivery.supply):
                     volume_for_delivery_for_product = _get_volume_for_product_p(
                         product_type=product.product_type,
-                        product_list=delivery.products,
+                        product_list=delivery.supply,
                     )
                 else:
                     volume_for_delivery_for_product = 0

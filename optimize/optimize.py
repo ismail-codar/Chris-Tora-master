@@ -17,10 +17,10 @@ FULL_ORDER = 864
 @dataclass(frozen=True)
 class RealizedResult:
     volume_delivered: int
-    order_nr: str
+    order_nr: int
     customer_id: str
     vendor_id: Optional[str]
-    delivery_id: Optional[int]
+    delivery_number: Optional[int]
     product_type: ProductType
     internal_delivery: bool
 
@@ -93,9 +93,9 @@ def _verify_solution(result_status, solver):
 def _get_realized_result(
         variables,
         start_day,
-        customers,
-        vendors,
-        product_specs,
+        customers: List[Customer],
+        vendors: List[Vendor],
+        product_specs: List[ProductSpec],
 ):
     realized_results = []
     for v, vendor in enumerate(vendors):
@@ -108,7 +108,7 @@ def _get_realized_result(
                                 volume_delivered=variables.x[v][d][c][o][p].solution_value(),
                                 order_nr=order.order_number,
                                 vendor_id=vendor.id,
-                                delivery_id=delivery.id,
+                                delivery_number=delivery.delivery_number,
                                 product_type=product.product_type,
                                 internal_delivery=True,
                                 customer_id=customer.id,
@@ -123,7 +123,7 @@ def _get_realized_result(
                         volume_delivered=variables.x[v][d][c][o][p].solution_value(),
                         order_nr=order.order_number,
                         vendor_id=None,
-                        delivery_id=None,
+                        delivery_number=None,
                         product_type=product.product_type,
                         internal_delivery=False,
                         customer_id=customer.id,

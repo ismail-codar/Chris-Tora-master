@@ -23,8 +23,16 @@ def calculate_profit_for_start_day(
         order: Order = _get_order_from_id(orders=customer.orders, order_nr=realized_result.order_nr)
 
         if realized_result.internal_delivery:
-            vendor: Vendor = _get_element_from_id(element_id=realized_result.vendor_id, elements=vendors)
-            delivery: Delivery = _get_element_from_id(element_id=realized_result.delivery_id, elements=vendor.deliveries)
+            vendor = next(
+                vendor
+                for vendor in vendors
+                if vendor.id == realized_result.vendor_id
+            )
+            delivery = next(
+                delivery
+                for delivery in vendor.deliveries
+                if delivery.delivery_number == realized_result.delivery_number
+            )
 
         price = get_price_for_product_p(
             product_type=realized_result.product_type,

@@ -61,7 +61,7 @@ def _filter_out_deliveries_out_of_time_scope(vendors: List[Vendor], end_day: int
             deliveries=[
                 delivery
                 for delivery in vendor.deliveries
-                if delivery.delivery_day <= end_day
+                if delivery.arrival_day <= end_day
             ]
         )
         for vendor in vendors
