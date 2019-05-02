@@ -15,26 +15,27 @@ class ProductType(Enum):
 
 
 def get_product_type(product_type: str):
-    if product_type == "1-2":
+    product_type_without_white_spaces = product_type.strip()
+    if product_type_without_white_spaces == "1-2":
         return ProductType.SALMON_1_2
-    if product_type == "2-3":
+    if product_type_without_white_spaces == "2-3":
         return ProductType.SALMON_2_3
-    if product_type == "3-4":
+    if product_type_without_white_spaces == "3-4":
         return ProductType.SALMON_3_4
-    # if product_type == "4-5":
+    # if product_type_without_white_spaces == "4-5":
     #      return ProductType.SALMON_4_5
-    # if product_type == "5-6":
+    # if product_type_without_white_spaces == "5-6":
     #     return ProductType.SALMON_5_6
-    # if product_type == "6-7":
+    # if product_type_without_white_spaces == "6-7":
     #     return ProductType.SALMON_6_7
-    # if product_type == "7-8":
+    # if product_type_without_white_spaces == "7-8":
     #     return ProductType.SALMON_7_8
-    # if product_type == "8-9":
+    # if product_type_without_white_spaces == "8-9":
     #     return ProductType.SALMON_8_9
-    # if product_type == "9+":
+    # if product_type_without_white_spaces == "9+":
     #     return ProductType.SALMON_9
     else:
-        raise Exception("Unknown product type")
+        raise Exception(product_type + "is an unknown product type. See file products.py")
 
 
 @dataclass(frozen=True)
