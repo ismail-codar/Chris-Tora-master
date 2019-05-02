@@ -7,6 +7,7 @@ from input_data.products import load_product_spec
 from optimize.optimize import start_optimize, Action
 from profit import calculate_profit_for_start_day
 from scenarios.load_scenarios import load_scenarios, Scenario
+import timeit
 
 DETERMINISTIC = True
 SIMULATE_RESULTS = True
@@ -27,14 +28,16 @@ def start_run():
         number_of_runs_in_one_scenario = TIME_HORIZON - NUMBER_OF_DAYS_IN_EACH_RUN + 1
 
         profit_for_scenarios = []
+        average_time_for_scenarios = []
 
         for scenario_index, scenario in enumerate(scenarios):
             vendors = load_vendors(
                 path="input_data/deliveries.xlsx",
-                adjust_delivery_estimate = ADJUST_DELIVERY_ESTIMATE
+                adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE
             )
             current_start_day = START_DAY
-            profit_for_scenario = []
+            profits_for_scenario = []
+            times_for_runs = []
 
             for run_number in range(number_of_runs_in_one_scenario):
 
@@ -54,11 +57,16 @@ def start_run():
                     start_day=current_start_day,
                     end_day=current_end_day,
                 )
+                start = timeit.timeit()
                 actions = start_optimize(
                     vendors=vendors_with_relevant_deliveries_for_next_run,
                     customers=customers_with_relevant_orders_for_next_run,
                     product_specs=product_specs,
                 )
+                end = timeit.timeit()
+                total_time = end - start
+                times_for_runs.append(total_time)
+
                 actions_with_delivery_date_today = [
                     action
                     for action in actions
@@ -71,17 +79,23 @@ def start_run():
                     actions=actions_with_delivery_date_today,
                     start_day=current_start_day,
                 )
-                profit_for_scenario.append(profit_from_todays_operation)
+                profits_for_scenario.append(profit_from_todays_operation)
+
                 update_delivery_volumes_after_todays_operations(
                     vendors=vendors,
                     todays_actions=actions_with_delivery_date_today,
                 )
                 current_start_day += 1
 
-            profit_for_scenario = sum(profit_for_scenario)
+            profit_for_scenario = sum(profit_for_scenarios)
+            average_time_for_scenario = sum(times_for_runs) / number_of_runs_in_one_scenario
             print("profit for scenario " + str(scenario_index) + ": " + str(profit_for_scenario))
             profit_for_scenarios.append(profit_for_scenario)
 
+            average_time_for_scenarios.append(average_time_for_scenario)
+
+        average_run_time = sum(average_time_for_scenarios) / len(scenarios)
+        print("Average run time: " + str(average_run_time))
         average_profit = sum(profit_for_scenarios) / len(profit_for_scenarios)
         print("Average profit is: " + str(average_profit))
 
