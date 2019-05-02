@@ -37,7 +37,6 @@ def calculate_profit_for_start_day(
     ]
 
     total_profit = sum(profit_for_realized_results) - sum(oslo_terminal_costs)
-    print("Profit for day " + str(start_day) + " is: " + str(total_profit))
     return total_profit
 
 
