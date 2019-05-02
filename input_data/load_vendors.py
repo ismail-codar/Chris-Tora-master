@@ -34,10 +34,6 @@ class Delivery:
     supply: List[Product]
     delivery_number: int
 
-    # delivery_day: int
-    # products: List[Product]
-    # id: str
-
 
 @dataclass(frozen=True)
 class Vendor:
@@ -46,8 +42,7 @@ class Vendor:
     transportation_cost_per_box: List[TransportationCost]
 
 
-def load_vendors():
-    path = "input_data/deliveries.xlsx"
+def load_vendors(path):
     workbook = xlrd.open_workbook(path)
     delivery_sheet = workbook.sheet_by_index(0)
     cell_values_deliveries = delivery_sheet._cell_values

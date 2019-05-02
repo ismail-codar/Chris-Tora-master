@@ -6,11 +6,19 @@ from input_data.products import ProductType, ProductSpec, Product
 
 
 def get_vendor_from_id(vendors: List[Vendor], vendor_id: str) -> Vendor:
-    return next(
+
+    if vendor_id is None:
+        stop = 3
+
+    vendor_with_vendor_id = next((
         vendor
         for vendor in vendors
         if vendor.id == vendor_id
-    )
+    ), None)
+    if vendor_with_vendor_id is None:
+        print("Not able to get correct vendor")
+    else:
+        return vendor_with_vendor_id
 
 
 def get_delivery_from_del_number(deliveries: List[Delivery], delivery_number: int) -> Delivery:
@@ -95,3 +103,15 @@ def get_transport_price_from_vendor_v(product_type: ProductType, transportation_
         if transportation_price.product_type == product_type:
             return transportation_price.cost
     raise Exception("Not able to access transportation price for product type " + product_type.name + " for vendor " + vendor_id)
+
+
+def get_product_with_product_type(products: List[Product], product_type: ProductType) -> Product:
+    product_of_correct_type = next(
+        product
+        for product in products
+        if product.product_type == product_type
+    )
+    if product_of_correct_type is None:
+        raise Exception("Could not find product with product type " + product_type.name)
+    else:
+        return product_of_correct_type

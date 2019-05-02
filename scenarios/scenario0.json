@@ -1,21 +1,33 @@
 {
   "results": [
     {
-      "vendor_id": "vendor_1",
+      "vendor_id": "Eidsfjord Sj\u00f8farm AS",
       "delivery_index": 0,
-      "actual_delivery_volume": 781,
-      "product_type": "SALMON_1_2"
+      "actual_delivery_volume": 11,
+      "product_type": "SALMON_3_4"
     },
     {
-      "vendor_id": "vendor_1",
+      "vendor_id": "Eidsfjord Sj\u00f8farm AS",
       "delivery_index": 0,
-      "actual_delivery_volume": 888,
+      "actual_delivery_volume": 10,
       "product_type": "SALMON_2_3"
     },
     {
-      "vendor_id": "vendor_2",
+      "vendor_id": "Icefishfarm",
       "delivery_index": 0,
-      "actual_delivery_volume": 2,
+      "actual_delivery_volume": 9,
+      "product_type": "SALMON_3_4"
+    },
+    {
+      "vendor_id": "Icefishfarm",
+      "delivery_index": 0,
+      "actual_delivery_volume": 9,
+      "product_type": "SALMON_1_2"
+    },
+    {
+      "vendor_id": "Icefishfarm",
+      "delivery_index": 0,
+      "actual_delivery_volume": 10,
       "product_type": "SALMON_2_3"
     }
   ]

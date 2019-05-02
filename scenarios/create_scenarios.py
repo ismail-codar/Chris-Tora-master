@@ -8,36 +8,31 @@ from input_data.products import ProductType
 
 NUMBER_OF_SCENARIOS = 2
 
-# Long term
+# Percentage
 AVERAGE_DEVIATION_SALMON_1_2 = 10
 AVERAGE_DEVIATION_SALMON_2_3 = 7
+AVERAGE_DEVIATION_SALMON_3_4 = 4
 
 
 def create_scenarios():
-
-    vendors: List[Vendor] = load_vendors()
+    vendor_path = "../input_data/deliveries.xlsx"
+    vendors: List[Vendor] = load_vendors(vendor_path)
 
     for scenario_number in range(NUMBER_OF_SCENARIOS):
         results = []
-        for vendor in vendorfs:
+        for vendor in vendors:
             for delivery_index, delivery in enumerate(vendor.deliveries):
-                for product in delivery.products:
+                for product in delivery.supply:
 
-                    product_type = product.product_type
-                    estimated_volume = product.volume
-
-                    if delivery.delivery_day == 0:
-                        actual_delivery_volume = estimated_volume
-                    else:
-                        actual_delivery_volume = _draw_actual_volume(
-                            product_type=product_type,
-                            estimated_volume=estimated_volume
-                        )
+                    actual_delivery_volume = _draw_actual_volume(
+                        product_type=product.product_type,
+                        estimated_volume=product.volume
+                    )
                     result = {
                         "vendor_id": vendor.id,
                         "delivery_index": delivery_index,
                         "actual_delivery_volume": actual_delivery_volume,
-                        "product_type": product_type.name
+                        "product_type": product.product_type.name
                     }
                     results.append(result)
 
@@ -61,6 +56,8 @@ def _get_average_percentage_deviation(product_type: ProductType) -> float:
         return AVERAGE_DEVIATION_SALMON_1_2
     elif product_type == ProductType.SALMON_2_3:
         return AVERAGE_DEVIATION_SALMON_2_3
+    elif product_type == ProductType.SALMON_3_4:
+        return AVERAGE_DEVIATION_SALMON_3_4
     else:
         raise Exception("unknown product type")
 

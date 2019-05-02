@@ -1,6 +1,6 @@
 from typing import List
 
-from helpers import get_vendor_from_id, get_delivery_from_del_number, get_order_from_id, get_customer_from_id, \
+from helpers import get_order_from_id, get_customer_from_id, \
     get_product_spec_from_product_type, get_transport_price_for_customer_c, get_customs_costs_for_product_p, get_transport_price_from_vendor_v
 from input_data.load_customers import Customer, Order
 from input_data.load_vendors import Vendor, Delivery
