@@ -22,18 +22,18 @@ def get_product_type(product_type: str):
         return ProductType.SALMON_2_3
     if product_type_without_white_spaces == "3-4":
         return ProductType.SALMON_3_4
-    # if product_type_without_white_spaces == "4-5":
-    #      return ProductType.SALMON_4_5
-    # if product_type_without_white_spaces == "5-6":
-    #     return ProductType.SALMON_5_6
-    # if product_type_without_white_spaces == "6-7":
-    #     return ProductType.SALMON_6_7
-    # if product_type_without_white_spaces == "7-8":
-    #     return ProductType.SALMON_7_8
-    # if product_type_without_white_spaces == "8-9":
-    #     return ProductType.SALMON_8_9
-    # if product_type_without_white_spaces == "9+":
-    #     return ProductType.SALMON_9
+    if product_type_without_white_spaces == "4-5":
+        return ProductType.SALMON_4_5
+    if product_type_without_white_spaces == "5-6":
+        return ProductType.SALMON_5_6
+    if product_type_without_white_spaces == "6-7":
+        return ProductType.SALMON_6_7
+    if product_type_without_white_spaces == "7-8":
+        return ProductType.SALMON_7_8
+    if product_type_without_white_spaces == "8-9":
+        return ProductType.SALMON_8_9
+    if product_type_without_white_spaces == "9+":
+        return ProductType.SALMON_9
     else:
         raise Exception(product_type + "is an unknown product type. See file products.py")
 
@@ -69,30 +69,30 @@ def load_product_spec():
             customs_cost=20.0,
             extra_cost=80.0,
         ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_4_5,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_5_6,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_6_7,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_7_8,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # ),
-        # ProductSpec(
-        #     product_type=ProductType.SALMON_8_9,
-        #     customs_cost=20.0,
-        #     extra_cost=80.0,
-        # )
+        ProductSpec(
+            product_type=ProductType.SALMON_4_5,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        ),
+        ProductSpec(
+            product_type=ProductType.SALMON_5_6,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        ),
+        ProductSpec(
+            product_type=ProductType.SALMON_6_7,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        ),
+        ProductSpec(
+            product_type=ProductType.SALMON_7_8,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        ),
+        ProductSpec(
+            product_type=ProductType.SALMON_8_9,
+            customs_cost=20.0,
+            extra_cost=80.0,
+        )
     ]
     return product_specs
