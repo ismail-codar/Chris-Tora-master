@@ -10,8 +10,8 @@ from optimize.variables import Variables
 from helpers import get_transport_price_from_vendor_v
 
 M = 1000000
-QUANTITY_FULL_ORDER = 864
-TERMINAL_COST=10
+QUANTITY_FULL_ORDER = 750
+TERMINAL_COST = 6.5
 
 def set_constraints(
         vendors: List[Vendor],
