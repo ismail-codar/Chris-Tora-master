@@ -10,7 +10,7 @@ from optimize.optimize import Action
 from optimize.constraints import TERMINAL_COST, QUANTITY_FULL_ORDER
 
 
-def calculate_profit_for_start_day(
+def calculate_profit_for_current_start_day(
         customers: List[Customer],
         start_day: int,
         vendors: List[Vendor],

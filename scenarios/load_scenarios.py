@@ -11,7 +11,7 @@ class ProductScenarioOutcome:
     product_type: ProductType
     actual_volume: int
     vendor_id: str
-    delivery_index: int
+    delivery_number: int
 
 
 @dataclass(frozen=True)
@@ -40,7 +40,7 @@ def _load_scenario(scenario_index: int) -> Scenario:
                 product_type=get_product_type(product_scenario_outcome["product_type"]),
                 actual_volume=product_scenario_outcome["actual_delivery_volume"],
                 vendor_id=product_scenario_outcome["vendor_id"],
-                delivery_index=product_scenario_outcome["delivery_index"]
+                delivery_number=product_scenario_outcome["delivery_number"]
             )
             for product_scenario_outcome in scenario_dicts["results"]
         ]

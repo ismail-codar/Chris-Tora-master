@@ -27,7 +27,7 @@ def create_scenarios():
     for scenario_number in range(NUMBER_OF_SCENARIOS):
         results = []
         for vendor in vendors:
-            for delivery_index, delivery in enumerate(vendor.deliveries):
+            for delivery in vendor.deliveries:
                 for product in delivery.supply:
 
                     actual_delivery_volume = _draw_actual_volume(
@@ -36,7 +36,7 @@ def create_scenarios():
                     )
                     result = {
                         "vendor_id": vendor.id,
-                        "delivery_index": delivery_index,
+                        "delivery_number": delivery.delivery_number,
                         "actual_delivery_volume": actual_delivery_volume,
                         "product_type": product.product_type.name
                     }
