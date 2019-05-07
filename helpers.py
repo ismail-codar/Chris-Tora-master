@@ -7,9 +7,6 @@ from input_data.products import ProductType, ProductSpec, Product
 
 def get_vendor_from_id(vendors: List[Vendor], vendor_id: str) -> Vendor:
 
-    if vendor_id is None:
-        stop = 3
-
     vendor_with_vendor_id = next((
         vendor
         for vendor in vendors

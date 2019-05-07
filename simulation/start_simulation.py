@@ -1,4 +1,5 @@
 import timeit
+from dataclasses import dataclass
 from typing import List
 
 from helpers import get_vendor_from_id, get_product_with_product_type, get_delivery_from_del_number
@@ -8,6 +9,14 @@ from input_data.products import ProductSpec
 from optimize.optimize import start_optimize, Action
 from profit import calculate_profit_for_current_start_day
 from scenarios.load_scenarios import Scenario
+from simulation.stochastic import optimize_with_one_product_type_at_the_time
+
+
+@dataclass(frozen=True)
+class ResultFromOneRun:
+    running_time: float
+    actions: List[Action]
+    profit: float
 
 
 def run_simulation(
@@ -18,7 +27,8 @@ def run_simulation(
         adjust_delivery_estimate: float,
         start_day: int,
         number_of_days_in_each_run: int,
-        deterministic: bool,
+        stochastic: bool,
+        one_product_type_at_the_time: bool,
 ):
     profit_for_scenarios = []
     average_time_for_scenarios = []
@@ -41,21 +51,33 @@ def run_simulation(
                 scenario=scenario,
                 current_day=current_start_day,
             )
-            vendors_with_relevant_deliveries_for_next_run = _filter_out_deliveries_after_end_time(
+            vendors_with_relevant_deliveries_for_next_time_period = _filter_out_deliveries_after_end_time(
                 vendors=vendors,
                 end_day=current_end_day,
             )
-            customers_with_relevant_orders_for_next_run = _filter_out_order_out_of_time_scope(
+            customers_with_relevant_orders_for_next_time_period = _filter_out_order_out_of_time_scope(
                 customers=customers,
                 start_day=current_start_day,
                 end_day=current_end_day,
             )
             start = timeit.timeit()
-            actions = start_optimize(
-                vendors=vendors_with_relevant_deliveries_for_next_run,
-                customers=customers_with_relevant_orders_for_next_run,
-                product_specs=product_specs,
-            )
+            if one_product_type_at_the_time:
+                actions = optimize_with_one_product_type_at_the_time(
+                    vendors=vendors_with_relevant_deliveries_for_next_time_period,
+                    customers=customers_with_relevant_orders_for_next_time_period,
+                    product_specs=product_specs,
+                    stochastic=stochastic,
+                    number_of_days_in_each_run=number_of_days_in_each_run,
+                )
+            else:
+                actions = start_optimize(
+                    vendors=vendors_with_relevant_deliveries_for_next_time_period,
+                    customers=customers_with_relevant_orders_for_next_time_period,
+                    product_specs=product_specs,
+                    stochastic=stochastic,
+                    number_of_days_in_each_run=number_of_days_in_each_run,
+                )
+
             end = timeit.timeit()
             total_time = end - start
             running_times_for_scenario.append(total_time)

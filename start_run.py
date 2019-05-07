@@ -5,19 +5,22 @@ from optimize.optimize import start_optimize
 from profit import calculate_profit_for_current_start_day
 from scenarios.load_scenarios import load_scenarios
 
-from simulation.start_simulation import _run_deterministic_simulation, _filter_out_deliveries_after_end_time, \
+from simulation.start_simulation import _filter_out_deliveries_after_end_time, \
     _filter_out_order_out_of_time_scope, run_simulation
 
-DETERMINISTIC = True
+STOCHASTIC = False
+ONE_PRODUCT_TYPE_AT_THE_TIME = True
 SIMULATE_RESULTS = True
 NUMBER_OF_DAYS_IN_EACH_RUN = 5
 TIME_HORIZON = 15
 START_DAY = 1
-
 ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
 
 
 def start_run():
+
+    if STOCHASTIC and not ONE_PRODUCT_TYPE_AT_THE_TIME:
+        raise Exception("If you do a stochastic run, you can only do one product type at the time")
 
     customers = load_customers()
     product_specs = load_product_spec()
@@ -34,7 +37,8 @@ def start_run():
             adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
             start_day=START_DAY,
             number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
-            deterministic=DETERMINISTIC
+            stochastic=STOCHASTIC,
+            one_product_type_at_the_time=ONE_PRODUCT_TYPE_AT_THE_TIME,
         )
 
     else:
@@ -57,6 +61,8 @@ def start_run():
             vendors=vendors_with_relevant_deliveries,
             customers=customers_with_relevant_orders,
             product_specs=product_specs,
+            stochastic=STOCHASTIC,
+            number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
         )
         profit_for_start_day = calculate_profit_for_current_start_day(
             vendors=vendors_with_relevant_deliveries,
