@@ -12,6 +12,7 @@ def optimize_with_one_product_type_at_the_time(
     product_specs: List[ProductSpec],
     stochastic: bool,
     number_of_days_in_each_run: int,
+    start_day: int,
 ) -> List[Action]:
 
     all_actions = []
@@ -32,6 +33,7 @@ def optimize_with_one_product_type_at_the_time(
             product_specs=[product_spec],
             stochastic=stochastic,
             number_of_days_in_each_run=number_of_days_in_each_run,
+            start_day=start_day,
         )
         all_actions.extend(actions_for_current_product_type)
 

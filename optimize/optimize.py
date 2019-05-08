@@ -37,6 +37,7 @@ def start_optimize(
         product_specs: List[ProductSpec],
         stochastic: bool,
         number_of_days_in_each_run: int,
+        start_day: int,
 ):
 
     solver = pywraplp.Solver(
@@ -44,7 +45,7 @@ def start_optimize(
     )
 
     if stochastic:
-        number_of_scenarios = number_of_days_in_each_run * 3
+        number_of_scenarios = 3 ** number_of_days_in_each_run
     else:
         number_of_scenarios = 1
 
@@ -63,6 +64,8 @@ def start_optimize(
         solver=solver,
         variables=variables,
         number_of_scenarios=number_of_scenarios,
+        number_of_days_in_one_run=number_of_days_in_each_run,
+        start_day=start_day,
     )
 
     objective = create_objective_function(

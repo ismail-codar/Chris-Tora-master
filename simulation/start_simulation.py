@@ -68,6 +68,7 @@ def run_simulation(
                     product_specs=product_specs,
                     stochastic=stochastic,
                     number_of_days_in_each_run=number_of_days_in_each_run,
+                    start_day=start_day,
                 )
             else:
                 actions = start_optimize(
@@ -76,6 +77,7 @@ def run_simulation(
                     product_specs=product_specs,
                     stochastic=stochastic,
                     number_of_days_in_each_run=number_of_days_in_each_run,
+                    start_day=start_day,
                 )
 
             end = timeit.timeit()

@@ -1,3 +1,4 @@
+import math
 from typing import List
 
 from ortools.linear_solver.pywraplp import Variable
@@ -7,7 +8,7 @@ from input_data.load_customers import Customer
 from input_data.load_vendors import Vendor, TransportationCost
 from input_data.products import ProductSpec, ProductType, Product
 from optimize.variables import Variables
-from helpers import get_transport_price_from_vendor_v
+from helpers import get_transport_price_from_vendor_v, get_average_percentage_deviation
 
 M = 1000000
 QUANTITY_FULL_ORDER = 864
@@ -21,6 +22,8 @@ def set_constraints(
         solver,
         variables: Variables,
         number_of_scenarios: int,
+        number_of_days_in_one_run: int,
+        start_day: int,
 ):
     _set_supply_and_demand_constraints(
         y_vars=variables.y,
@@ -30,6 +33,8 @@ def set_constraints(
         customers=customers,
         solver=solver,
         number_of_scenarios=number_of_scenarios,
+        number_of_days_in_one_run=number_of_days_in_one_run,
+        start_day=start_day,
     )
     _set_a_customer_constraints(
         x_vars=variables.x,
@@ -154,6 +159,8 @@ def _set_supply_and_demand_constraints(
         customers: List[Customer],
         solver,
         number_of_scenarios: int,
+        number_of_days_in_one_run: int,
+        start_day: int,
 ):
     # Cannot sell more than supply
     for s in range(number_of_scenarios):
@@ -162,10 +169,25 @@ def _set_supply_and_demand_constraints(
                 for p, product in enumerate(product_specs):
 
                     if _product_list_contains_product_p(product_type=product.product_type, products=delivery.supply):
-                        volume_for_delivery_for_product = _get_volume_for_product_p(
-                            product_type=product.product_type,
-                            product_list=delivery.supply,
-                        )
+                        if number_of_scenarios > 1:
+                            estimated_volume_for_delivery_for_product = _get_volume_for_product_p(
+                                product_type=product.product_type,
+                                product_list=delivery.supply,
+                            )
+                            volume_for_delivery_for_product = _get_supply_for_current_scenario(
+                                scenario_index=s,
+                                arrival_day=delivery.arrival_day,
+                                start_day=start_day,
+                                estimated_volume=estimated_volume_for_delivery_for_product,
+                                number_of_days_in_one_run=number_of_days_in_one_run,
+                                product_type=product.product_type,
+                                product_specs=product_specs,
+                            )
+                        else:
+                            volume_for_delivery_for_product = _get_volume_for_product_p(
+                                product_type=product.product_type,
+                                product_list=delivery.supply,
+                            )
                     else:
                         volume_for_delivery_for_product = 0
 
@@ -306,23 +328,45 @@ def _set_a_customer_constraints(
                 b_customer_index += 1
 
 
+def _get_supply_for_current_scenario(
+        scenario_index: int,
+        arrival_day: int,
+        start_day: int,
+        estimated_volume: int,
+        number_of_days_in_one_run: int,
+        product_type: ProductType,
+        product_specs: List[ProductSpec],
+) -> float:
+
+    supply_level = _get_supply_level_from_scenario_index(
+        arrival_day=arrival_day,
+        number_of_days_in_one_run=number_of_days_in_one_run,
+        scenario_index=scenario_index,
+        start_day=start_day,
+    )
+
+    average_percentage_deviation = get_average_percentage_deviation(
+        product_specs=product_specs, product_type=product_type,
+    )
+    variance = estimated_volume * average_percentage_deviation / 100
+    standard_deviation = variance ** 1/2
+
+    if supply_level == 0:
+        return estimated_volume * (1 - standard_deviation)
+    if supply_level == 1:
+        return estimated_volume
+    if supply_level == 2:
+        return estimated_volume * (1 + standard_deviation)
 
 
+def _get_supply_level_from_scenario_index(arrival_day, number_of_days_in_one_run, scenario_index, start_day):
+    day_index_of_this_delivery = arrival_day - start_day
+    last_day_index = number_of_days_in_one_run - 1
+    days_to_iterate_back_in_scenario_tree = last_day_index - day_index_of_this_delivery
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if days_to_iterate_back_in_scenario_tree > 0:
+        branch_index_of_the_day_of_the_delivery = math.floor(scenario_index / (3 ** days_to_iterate_back_in_scenario_tree))
+    else:
+        branch_index_of_the_day_of_the_delivery = scenario_index
+    supply_level = branch_index_of_the_day_of_the_delivery % 3
+    return supply_level

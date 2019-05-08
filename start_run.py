@@ -63,6 +63,7 @@ def start_run():
             product_specs=product_specs,
             stochastic=STOCHASTIC,
             number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
+            start_day=start_day,
         )
         profit_for_start_day = calculate_profit_for_current_start_day(
             vendors=vendors_with_relevant_deliveries,
