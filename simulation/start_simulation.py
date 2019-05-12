@@ -28,13 +28,16 @@ def run_simulation(
         number_of_days_in_each_run: int,
         stochastic: bool,
         one_product_type_at_the_time: bool,
-        vendors: List[Vendor],
+        adjust_delivery_estimate: float,
 ):
     profit_for_scenarios = []
     average_time_for_scenarios = []
 
     for scenario_index, scenario in enumerate(scenarios):
-
+        vendors = load_vendors(
+            path="input_data/deliveries.xlsx",
+            adjust_delivery_estimate=adjust_delivery_estimate,
+        )
         current_start_day = start_day
         profits_for_scenario = []
         running_times_for_scenario = []

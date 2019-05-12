@@ -202,7 +202,6 @@ def _set_supply_and_demand_constraints(
                             )
                     else:
                         volume_for_delivery_for_product = 0
-
                     constraint_delivery_and_product = solver.Constraint(0, volume_for_delivery_for_product)
                     for c, customer in enumerate(customers):
                         for o, order in enumerate(customer.orders):
@@ -221,7 +220,6 @@ def _set_supply_and_demand_constraints(
                         )
                     else:
                         quantity_demanded_for_product_type = 0
-
                     constraint_demand_and_product = solver.Constraint(0, quantity_demanded_for_product_type)
                     constraint_demand_and_product.SetCoefficient(y_vars[s][c][o][p], 1)
 
@@ -359,11 +357,11 @@ def _get_supply_for_current_scenario(
     standard_deviation = variance ** 1/2
 
     if supply_level == 0:
-        return estimated_volume * (1 - standard_deviation)
+        return estimated_volume - standard_deviation
     if supply_level == 1:
         return estimated_volume
     if supply_level == 2:
-        return estimated_volume * (1 + standard_deviation)
+        return estimated_volume + standard_deviation
 
 
 def _get_supply_level_from_scenario_index(arrival_day, number_of_days_in_one_run, scenario_index, start_day):

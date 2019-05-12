@@ -24,10 +24,6 @@ def start_run():
 
     customers = load_customers()
     product_specs = load_product_spec()
-    vendors = load_vendors(
-        path="input_data/deliveries.xlsx",
-        adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
-    )
 
     if SIMULATE_RESULTS:
         scenarios = load_scenarios()
@@ -42,11 +38,14 @@ def start_run():
             number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
             stochastic=STOCHASTIC,
             one_product_type_at_the_time=ONE_PRODUCT_TYPE_AT_THE_TIME,
-            vendors=vendors,
+            adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
         )
 
     else:
-
+        vendors = load_vendors(
+            path="input_data/deliveries.xlsx",
+            adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
+        )
         start_day = START_DAY
         end_day = start_day + NUMBER_OF_DAYS_IN_EACH_RUN
         vendors_with_relevant_deliveries = _filter_out_deliveries_after_end_time(
