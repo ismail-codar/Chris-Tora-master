@@ -369,11 +369,14 @@ def _get_supply_for_current_scenario(
 def _get_supply_level_from_scenario_index(arrival_day, number_of_days_in_one_run, scenario_index, start_day):
     day_index_of_this_delivery = arrival_day - start_day
     last_day_index = number_of_days_in_one_run - 1
-    days_to_iterate_back_in_scenario_tree = last_day_index - day_index_of_this_delivery
 
-    if days_to_iterate_back_in_scenario_tree > 0:
-        branch_index_of_the_day_of_the_delivery = math.floor(scenario_index / (3 ** days_to_iterate_back_in_scenario_tree))
-    else:
+    days_to_iterate_back_in_scenario_tree = last_day_index - day_index_of_this_delivery
+    if day_index_of_this_delivery == 0:
+        branch_index_of_the_day_of_the_delivery = 1 # medium
+    elif days_to_iterate_back_in_scenario_tree == 0:
         branch_index_of_the_day_of_the_delivery = scenario_index
+    else:
+        branch_index_of_the_day_of_the_delivery = math.floor(scenario_index / (3 ** days_to_iterate_back_in_scenario_tree))
+
     supply_level = branch_index_of_the_day_of_the_delivery % 3
     return supply_level

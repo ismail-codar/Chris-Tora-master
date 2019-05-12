@@ -11,7 +11,7 @@ class Optimize(TestCase):
     def test_case_in_optimize(self):
 
         order = Order(
-            departure_day=3,
+            departure_day=0,
             demand=[Product(
                 product_type=ProductType.SALMON_1_2,
                 volume=100,
@@ -34,7 +34,7 @@ class Optimize(TestCase):
         ]
 
         delivery = Delivery(
-            arrival_day=2,
+            arrival_day=0,
             supply=[Product(
                 product_type=ProductType.SALMON_1_2,
                 volume=100,
@@ -65,9 +65,9 @@ class Optimize(TestCase):
             vendors=vendors,
             customers=customers,
             product_specs=product_specs,
-            stochastic=False,
+            stochastic=True,
             number_of_days_in_each_run=2,
-            start_day=1,
+            start_day=0,
             return_only_first_scenario=False,
         )
         stop = 3

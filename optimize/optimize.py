@@ -46,7 +46,7 @@ def start_optimize(
     )
 
     if stochastic:
-        number_of_scenarios = 3 ** number_of_days_in_each_run
+        number_of_scenarios = 3 ** (number_of_days_in_each_run - 1)
     else:
         number_of_scenarios = 1
 
