@@ -11,6 +11,7 @@ from simulation.start_simulation import _filter_out_deliveries_after_end_time, \
 STOCHASTIC = True
 ONE_PRODUCT_TYPE_AT_THE_TIME = True
 SIMULATE_RESULTS = True
+NUMBER_OF_SCENARIOS = 10
 NUMBER_OF_DAYS_IN_EACH_RUN = 4
 START_DAY = 1
 END_DAY = 15
@@ -26,7 +27,7 @@ def start_run():
     product_specs = load_product_spec()
 
     if SIMULATE_RESULTS:
-        scenarios = load_scenarios()
+        scenarios = load_scenarios(number_of_scenarios=NUMBER_OF_SCENARIOS)
         number_of_runs_in_one_scenario = (END_DAY - START_DAY) - NUMBER_OF_DAYS_IN_EACH_RUN + 2
 
         run_simulation(

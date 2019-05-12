@@ -7,7 +7,7 @@ from helpers import get_average_percentage_deviation
 from input_data.load_vendors import load_vendors, Vendor
 from input_data.products import load_product_spec
 
-NUMBER_OF_SCENARIOS = 2
+NUMBER_OF_SCENARIOS = 10
 
 
 def create_scenarios():

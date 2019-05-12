@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import List
 
 from input_data.products import ProductType
-NUMBER_OF_SCENARIOS = 2
 
 
 @dataclass(frozen=True)
@@ -19,10 +18,10 @@ class Scenario:
     product_outcomes: List[ProductScenarioOutcome]
 
 
-def load_scenarios():
+def load_scenarios(number_of_scenarios: int):
     scenarios = [
         _load_scenario(scenario_index)
-        for scenario_index in range(NUMBER_OF_SCENARIOS)
+        for scenario_index in range(number_of_scenarios)
     ]
     return scenarios
 
