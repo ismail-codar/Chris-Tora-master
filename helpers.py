@@ -7,9 +7,6 @@ from input_data.products import ProductType, ProductSpec, Product
 
 def get_vendor_from_id(vendors: List[Vendor], vendor_id: str) -> Vendor:
 
-    if vendor_id is None:
-        stop = 3
-
     vendor_with_vendor_id = next((
         vendor
         for vendor in vendors
@@ -115,3 +112,18 @@ def get_product_with_product_type(products: List[Product], product_type: Product
         raise Exception("Could not find product with product type " + product_type.name)
     else:
         return product_of_correct_type
+
+
+def get_average_percentage_deviation(product_specs: List[ProductSpec], product_type: ProductType):
+    average_deviation = next(
+        (
+            product_spec.average_deviation
+            for product_spec in product_specs
+            if product_spec.product_type == product_type
+        ),
+        None
+    )
+    if average_deviation is None:
+        raise Exception("Could not find product " + str(product_type) + "in product specs")
+    else:
+        return average_deviation

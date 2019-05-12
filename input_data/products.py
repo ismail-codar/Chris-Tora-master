@@ -13,6 +13,17 @@ class ProductType(Enum):
     SALMON_8_9 = 7
     SALMON_9 = 8
 
+# Percentage
+AVERAGE_DEVIATION_SALMON_1_2 = 5.12
+AVERAGE_DEVIATION_SALMON_2_3 = 3.28 # -
+AVERAGE_DEVIATION_SALMON_3_4 = 4.81 # -
+AVERAGE_DEVIATION_SALMON_4_5 = 0.54 # -
+AVERAGE_DEVIATION_SALMON_5_6 = 0.55 # -
+AVERAGE_DEVIATION_SALMON_6_7 = 2.95
+AVERAGE_DEVIATION_SALMON_7_8 = 6.17
+AVERAGE_DEVIATION_SALMON_8_9 = 9.14
+AVERAGE_DEVIATION_SALMON_9 = 9.56
+
 
 def get_product_type(product_type: str):
     product_type_without_white_spaces = product_type.strip()
@@ -50,6 +61,7 @@ class ProductSpec:
     product_type: ProductType
     customs_cost: float
     extra_cost: float
+    average_deviation: float
 
 
 def load_product_spec():
@@ -58,16 +70,19 @@ def load_product_spec():
             product_type=ProductType.SALMON_1_2,
             customs_cost=20.0,
             extra_cost=1000.0,
+            average_deviation=AVERAGE_DEVIATION_SALMON_1_2
         ),
         ProductSpec(
             product_type=ProductType.SALMON_2_3,
             customs_cost=20.0,
             extra_cost=1000.0,
+            average_deviation=AVERAGE_DEVIATION_SALMON_2_3
         ),
         ProductSpec(
             product_type=ProductType.SALMON_3_4,
             customs_cost=20.0,
             extra_cost=80.0,
+            average_deviation=AVERAGE_DEVIATION_SALMON_3_4
         ),
         ProductSpec(
             product_type=ProductType.SALMON_4_5,
@@ -96,3 +111,7 @@ def load_product_spec():
         )
     ]
     return product_specs
+
+
+
+
