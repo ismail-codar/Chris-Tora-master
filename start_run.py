@@ -11,9 +11,9 @@ from simulation.start_simulation import _filter_out_deliveries_after_end_time, \
 STOCHASTIC = True
 ONE_PRODUCT_TYPE_AT_THE_TIME = True
 SIMULATE_RESULTS = True
-NUMBER_OF_DAYS_IN_EACH_RUN = 5
+NUMBER_OF_DAYS_IN_EACH_RUN = 4
 START_DAY = 1
-END_DAY = 5
+END_DAY = 15
 ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
 
 

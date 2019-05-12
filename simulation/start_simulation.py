@@ -34,6 +34,7 @@ def run_simulation(
     average_time_for_scenarios = []
 
     for scenario_index, scenario in enumerate(scenarios):
+        print("Simulating over scenario " + str(scenario_index))
         vendors = load_vendors(
             path="input_data/deliveries.xlsx",
             adjust_delivery_estimate=adjust_delivery_estimate,
@@ -43,7 +44,10 @@ def run_simulation(
         running_times_for_scenario = []
 
         for run_number in range(number_of_runs_in_one_scenario):
+            print("--------------------------")
+            print("Run number " + str(run_number) + " in scenario " + str(scenario_index))
             current_end_day = current_start_day + number_of_days_in_each_run - 1
+            print("Optimize from day " + str(current_start_day) + " to day " + str(current_end_day))
 
             update_todays_deliveries_based_on_actual_volume_in_scenario(
                 vendors=vendors,
@@ -59,29 +63,39 @@ def run_simulation(
                 start_day=current_start_day,
                 end_day=current_end_day,
             )
-            start = timeit.timeit()
-            if one_product_type_at_the_time:
-                actions = optimize_with_one_product_type_at_the_time(
-                    vendors=vendors_with_relevant_deliveries_for_next_time_period,
-                    customers=customers_with_relevant_orders_for_next_time_period,
-                    product_specs=product_specs,
-                    stochastic=stochastic,
-                    number_of_days_in_each_run=number_of_days_in_each_run,
-                    start_day=start_day,
-                )
+            number_of_relevant_orders = len([
+                order
+                for customer in customers_with_relevant_orders_for_next_time_period
+                for order in customer.orders
+                if order.departure_day == current_start_day
+            ])
+            print("number of orders with delivery today: " + str(number_of_relevant_orders))
+            if number_of_relevant_orders > 0:
+                start = timeit.timeit()
+                if one_product_type_at_the_time:
+                    actions = optimize_with_one_product_type_at_the_time(
+                        vendors=vendors_with_relevant_deliveries_for_next_time_period,
+                        customers=customers_with_relevant_orders_for_next_time_period,
+                        product_specs=product_specs,
+                        stochastic=stochastic,
+                        number_of_days_in_each_run=number_of_days_in_each_run,
+                        start_day=start_day,
+                    )
+                else:
+                    actions = start_optimize(
+                        vendors=vendors_with_relevant_deliveries_for_next_time_period,
+                        customers=customers_with_relevant_orders_for_next_time_period,
+                        product_specs=product_specs,
+                        stochastic=stochastic,
+                        number_of_days_in_each_run=number_of_days_in_each_run,
+                        start_day=start_day,
+                    )
+                end = timeit.timeit()
+                total_time = end - start
+                print("Run time: " + str(total_time) + " sec")
+                running_times_for_scenario.append(total_time)
             else:
-                actions = start_optimize(
-                    vendors=vendors_with_relevant_deliveries_for_next_time_period,
-                    customers=customers_with_relevant_orders_for_next_time_period,
-                    product_specs=product_specs,
-                    stochastic=stochastic,
-                    number_of_days_in_each_run=number_of_days_in_each_run,
-                    start_day=start_day,
-                )
-
-            end = timeit.timeit()
-            total_time = end - start
-            running_times_for_scenario.append(total_time)
+                actions = []
 
             actions_with_transportation_date_today = [
                 action
@@ -95,6 +109,7 @@ def run_simulation(
                 actions=actions_with_transportation_date_today,
                 start_day=current_start_day,
             )
+            print("Profit from day " + str(current_start_day) + " = " + str(profit_from_todays_operation))
             profits_for_scenario.append(profit_from_todays_operation)
 
             update_delivery_volumes_after_todays_operations(

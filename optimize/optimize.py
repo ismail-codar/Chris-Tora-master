@@ -12,7 +12,7 @@ from optimize.variables import create_variables_and_set_on_solver
 
 TERMINAL_COST = 10000
 FULL_ORDER = 864
-PRINT_VARIABLE_RESULTS = True
+PRINT_VARIABLE_RESULTS = False
 
 
 @dataclass(frozen=True)
