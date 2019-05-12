@@ -5,8 +5,9 @@ from ortools.linear_solver.pywraplp import Variable
 
 from input_data.customer_category import CustomerCategory
 from input_data.load_customers import Customer
-from input_data.load_vendors import Vendor, TransportationCost
+from input_data.load_vendors import Vendor
 from input_data.products import ProductSpec, ProductType, Product
+from optimize.non_anticipativity import set_non_anticipativity_constraints
 from optimize.variables import Variables
 from helpers import get_transport_price_from_vendor_v, get_average_percentage_deviation
 
@@ -74,6 +75,18 @@ def set_constraints(
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
     )
+    if number_of_scenarios > 1:
+        set_non_anticipativity_constraints(
+            variables=variables,
+            number_of_days_in_one_run=number_of_days_in_one_run,
+            start_day=start_day,
+            number_of_scenarios=number_of_scenarios,
+            customers=customers,
+            vendors=vendors,
+            product_specs=product_specs,
+            solver=solver,
+        )
+
 
 # Cross-Docking Constraint
 def _set_cross_docking_constraint(
@@ -115,7 +128,7 @@ def _set_cross_docking_constraint(
                                 transportation_price_per_box=vendor.transportation_cost_per_box,
                                 vendor_id=vendor.id
                             )
-                            constraint_via_oslo.SetCoefficient(x_vars[s][v][d][c][o][p], -(transportation_cost+TERMINAL_COST))
+                            constraint_via_oslo.SetCoefficient(x_vars[s][v][d][c][o][p], - (transportation_cost+TERMINAL_COST))
 
 
 # Time Constraint
@@ -146,7 +159,6 @@ def _set_time_constraints(
             for d, delivery in enumerate(vendor.deliveries):
                 for c, customer in enumerate(customers):
                     for o, order in enumerate(customer.orders):
-
                         constraint_time_pt2 = solver.Constraint(0, order.departure_day - delivery.arrival_day + M)
                         constraint_time_pt2.SetCoefficient(z_vars[s][v][d][c][o], M)
 
@@ -282,7 +294,6 @@ def _set_a_customer_constraints(
         for c_a, customer_a in enumerate(customers):
             if customer_a.customer_category == CustomerCategory.A:
                 for o_a, order_a in enumerate(customer_a.orders):
-                    b_customer_index = 0
                     for c_b, customer_b in enumerate(customers):
                         if customer_b.customer_category == CustomerCategory.B:
                             for o_b, order_b in enumerate(customer_b.orders):
@@ -293,25 +304,22 @@ def _set_a_customer_constraints(
                                             product_type=product.product_type,
                                             products=order_a.demand
                                         ):
-                                            demand = _get_volume_for_product_p(
+                                            demand_from_order_a = _get_volume_for_product_p(
                                                 product_type=product.product_type,
                                                 product_list=order_a.demand,
                                             )
                                         else:
-                                            demand = 0
+                                            demand_from_order_a = 0
 
-                                        constraint_a_customer = solver.Constraint(demand - M, solver.infinity())
+                                        constraint_a_customer = solver.Constraint(demand_from_order_a - M, solver.infinity())
 
                                         constraint_a_customer.SetCoefficient(y_vars[s][c_a][o_a][p], 1)
-                                        constraint_a_customer.SetCoefficient(t_vars[s][b_customer_index][o_b][p], M)
+                                        constraint_a_customer.SetCoefficient(t_vars[s][c_b][o_b][p], M)
 
                                         for v, vendor in enumerate(vendors):
                                             for d, delivery in enumerate(vendor.deliveries):
-                                                constraint_a_customer.SetCoefficient(x_vars[s][v][d][c_a][o_a][p], 1)
+                                                    constraint_a_customer.SetCoefficient(x_vars[s][v][d][c_a][o_a][p], 1)
 
-                            b_customer_index += 1
-
-    b_customer_index = 0
     for s in range(number_of_scenarios):
         for c_b, customer_b in enumerate(customers):
             if customer_b.customer_category == CustomerCategory.B:
@@ -320,12 +328,11 @@ def _set_a_customer_constraints(
 
                         constraint_b_customer = solver.Constraint(-solver.infinity(), 0)
                         constraint_b_customer.SetCoefficient(y_vars[s][c_b][o_b][p], 1)
-                        constraint_b_customer.SetCoefficient(t_vars[s][b_customer_index][o_b][p], -M)
+                        constraint_b_customer.SetCoefficient(t_vars[s][c_b][o_b][p], -M)
 
                         for v, vendor in enumerate(vendors):
                             for d, delivery in enumerate(vendor.deliveries):
                                 constraint_b_customer.SetCoefficient(x_vars[s][v][d][c_b][o_b][p], 1)
-                b_customer_index += 1
 
 
 def _get_supply_for_current_scenario(

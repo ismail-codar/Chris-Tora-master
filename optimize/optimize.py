@@ -12,7 +12,7 @@ from optimize.variables import create_variables_and_set_on_solver
 
 TERMINAL_COST = 10000
 FULL_ORDER = 864
-PRINT_VARIABLE_RESULTS = False
+PRINT_VARIABLE_RESULTS = True
 
 
 @dataclass(frozen=True)
@@ -125,7 +125,7 @@ def _get_actions(
 ):
     actions_in_house = [
         Action(
-            volume_delivered=variables.x[s][v][d][c][o][p].solution_value(),
+            volume_delivered=variables.x[0][v][d][c][o][p].solution_value(),
             order_nr=order.order_number,
             vendor_id=vendor.id,
             delivery_number=delivery.delivery_number,
@@ -134,13 +134,12 @@ def _get_actions(
             customer_id=customer.id,
             transportation_day=order.departure_day
         )
-        for s in range(number_of_scenarios)
         for v, vendor in enumerate(vendors)
         for d, delivery in enumerate(vendor.deliveries)
         for c, customer in enumerate(customers)
         for o, order in enumerate(customer.orders)
         for p, product in enumerate(product_specs)
-        if variables.x[s][v][d][c][o][p].solution_value() > 0
+        if variables.x[0][v][d][c][o][p].solution_value() > 0
     ]
 
     actions_from_competitors = [
@@ -187,13 +186,13 @@ def _print_solution_statistic(
                                       "_c" + str(c + 1) +
                                       "_o" + str(o + 1) +
                                       "_p" + str(p + 1) +
-                                      "): " + str(variables.x[v][d][c][o][p].solution_value()))
+                                      "): " + str(variables.x[s][v][d][c][o][p].solution_value()))
 
         for c, customer in enumerate(customers):
             for o, order in enumerate(customer.orders):
                 for p, product in enumerate(product_specs):
                     if variables.y[s][c][o][p].solution_value() > 0:
-                        print("y(s" + str(s + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "_p" + str(p + 1) + "): " + str(variables.y[c][o][p].solution_value()))
+                        print("y(s" + str(s + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "_p" + str(p + 1) + "): " + str(variables.y[s][c][o][p].solution_value()))
 
         # b_customer_index = 0
         # for c, customer in enumerate(customers):

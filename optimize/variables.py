@@ -125,10 +125,9 @@ def _create_t_vars (
                 ]
                 for order in customer.orders
             ]
-            for scenario in range(number_of_scenarios)
+            for customer in customers
         ]
-        for customer in customers
-        if customer.customer_category == CustomerCategory.B
+        for scenario in range(number_of_scenarios)
     ]
     return t_vars
 
