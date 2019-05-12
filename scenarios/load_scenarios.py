@@ -55,5 +55,17 @@ def get_product_type(product_type: str):
         return ProductType.SALMON_2_3
     if product_type == "SALMON_3_4":
         return ProductType.SALMON_3_4
+    if product_type == "SALMON_4_5":
+        return ProductType.SALMON_4_5
+    if product_type == "SALMON_5_6":
+        return ProductType.SALMON_5_6
+    if product_type == "SALMON_6_7":
+        return ProductType.SALMON_6_7
+    if product_type == "SALMON_7_8":
+        return ProductType.SALMON_7_8
+    if product_type == "SALMON_8_9":
+        return ProductType.SALMON_8_9
+    if product_type == "SALMON_9":
+        return ProductType.SALMON_9
     else:
         raise Exception("Unknown product type")

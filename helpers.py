@@ -19,11 +19,17 @@ def get_vendor_from_id(vendors: List[Vendor], vendor_id: str) -> Vendor:
 
 
 def get_delivery_from_del_number(deliveries: List[Delivery], delivery_number: int) -> Delivery:
-    return next(
-        delivery
-        for delivery in deliveries
-        if delivery.delivery_number == delivery_number
+    delivery = next(
+        (
+            delivery
+            for delivery in deliveries
+            if delivery.delivery_number == delivery_number
+        ), None
     )
+    if delivery is None:
+        raise Exception("Could not find delivery in delivery list")
+    else:
+        return delivery
 
 
 def get_order_from_id(order_nr: int, orders: List[Order]) -> Order:

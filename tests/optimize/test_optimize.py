@@ -68,6 +68,4 @@ class Optimize(TestCase):
             stochastic=True,
             number_of_days_in_each_run=2,
             start_day=0,
-            return_only_first_scenario=False,
         )
-        stop = 3
