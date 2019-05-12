@@ -128,7 +128,7 @@ def _set_cross_docking_constraint(
                                 transportation_price_per_box=vendor.transportation_cost_per_box,
                                 vendor_id=vendor.id
                             )
-                            constraint_via_oslo.SetCoefficient(x_vars[s][v][d][c][o][p], - (transportation_cost+TERMINAL_COST))
+                            constraint_via_oslo.SetCoefficient(x_vars[s][v][d][c][o][p], - (transportation_cost + TERMINAL_COST))
 
 
 # Time Constraint

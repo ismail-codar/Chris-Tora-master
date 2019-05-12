@@ -38,6 +38,7 @@ def start_optimize(
         stochastic: bool,
         number_of_days_in_each_run: int,
         start_day: int,
+        return_only_first_scenario=True,
 ):
 
     solver = pywraplp.Solver(
@@ -75,6 +76,7 @@ def start_optimize(
         customers=customers,
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
+        number_of_days_in_one_run=number_of_days_in_each_run,
     )
     objective.SetMaximization()
     # solver.SetTimeLimit(60000)  # milli sec
@@ -98,6 +100,7 @@ def start_optimize(
         vendors=vendors,
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
+        return_only_first_scenario=return_only_first_scenario,
     )
     return actions
 
@@ -122,7 +125,17 @@ def _get_actions(
         vendors: List[Vendor],
         product_specs: List[ProductSpec],
         number_of_scenarios: int,
+        return_only_first_scenario: bool,
 ):
+    if not return_only_first_scenario:
+        _make_actions_from_all_scenarios(
+            variables=variables,
+            customers=customers,
+            vendors=vendors,
+            product_specs=product_specs,
+            number_of_scenarios=number_of_scenarios,
+        )
+
     actions_in_house = [
         Action(
             volume_delivered=variables.x[0][v][d][c][o][p].solution_value(),
@@ -140,6 +153,53 @@ def _get_actions(
         for o, order in enumerate(customer.orders)
         for p, product in enumerate(product_specs)
         if variables.x[0][v][d][c][o][p].solution_value() > 0
+    ]
+
+    actions_from_competitors = [
+        Action(
+            volume_delivered=variables.y[0][c][o][p].solution_value(),
+            order_nr=order.order_number,
+            vendor_id=None,
+            delivery_number=None,
+            product_type=product.product_type,
+            internal_delivery=False,
+            customer_id=customer.id,
+            transportation_day=order.departure_day
+        )
+        for c, customer in enumerate(customers)
+        for o, order in enumerate(customer.orders)
+        for p, product in enumerate(product_specs)
+        if variables.y[0][c][o][p].solution_value() > 0
+    ]
+    all_actions = actions_in_house + actions_from_competitors
+    return all_actions
+
+
+def _make_actions_from_all_scenarios(
+        variables,
+        customers: List[Customer],
+        vendors: List[Vendor],
+        product_specs: List[ProductSpec],
+        number_of_scenarios: int,
+):
+    actions_in_house = [
+        Action(
+            volume_delivered=variables.x[s][v][d][c][o][p].solution_value(),
+            order_nr=order.order_number,
+            vendor_id=vendor.id,
+            delivery_number=delivery.delivery_number,
+            product_type=product.product_type,
+            internal_delivery=True,
+            customer_id=customer.id,
+            transportation_day=order.departure_day
+        )
+        for s in range(number_of_scenarios)
+        for v, vendor in enumerate(vendors)
+        for d, delivery in enumerate(vendor.deliveries)
+        for c, customer in enumerate(customers)
+        for o, order in enumerate(customer.orders)
+        for p, product in enumerate(product_specs)
+        if variables.x[s][v][d][c][o][p].solution_value() > 0
     ]
 
     actions_from_competitors = [
@@ -210,9 +270,10 @@ def _print_solution_statistic(
         #                 if variables.d[v][d][c][o].solution_value() > -10:
         #                     print("d(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[v][d][c][o].solution_value()))
         #
-        # for v, vendor in enumerate(vendors):
-        #     for d, delivery in enumerate(vendor.deliveries):
-        #         for c, customer in enumerate(customers):
-        #             for o, order in enumerate(customer.orders):
-        #                 if variables.o[v][d][c][o].solution_value() > -1:
-        #                     print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[v][d][c][o].solution_value()))
+        for s in range(number_of_scenarios):
+            for v, vendor in enumerate(vendors):
+                for d, delivery in enumerate(vendor.deliveries):
+                    for c, customer in enumerate(customers):
+                        for o, order in enumerate(customer.orders):
+                            if variables.o[s][v][d][c][o].solution_value() > -1:
+                                print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[s][v][d][c][o].solution_value()))
