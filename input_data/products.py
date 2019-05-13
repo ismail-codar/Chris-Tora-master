@@ -68,56 +68,56 @@ def load_product_spec():
     product_specs = [
         ProductSpec(
             product_type=ProductType.SALMON_1_2,
-            customs_cost=20.0,
-            extra_cost=1000.0,
+            customs_cost=60.0,
+            extra_cost=1347.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_1_2
         ),
         ProductSpec(
             product_type=ProductType.SALMON_2_3,
-            customs_cost=20.0,
-            extra_cost=1000.0,
+            customs_cost=60.0,
+            extra_cost=1487.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_2_3
         ),
         ProductSpec(
             product_type=ProductType.SALMON_3_4,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1334.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_3_4
         ),
         ProductSpec(
             product_type=ProductType.SALMON_4_5,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1653,
             average_deviation=AVERAGE_DEVIATION_SALMON_4_5,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_5_6,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1690.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_5_6,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_6_7,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1717.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_6_7,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_7_8,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1725.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_7_8,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_8_9,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1713.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_8_9,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_9,
-            customs_cost=20.0,
-            extra_cost=80.0,
+            customs_cost=60.0,
+            extra_cost=1694.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_9,
         )
     ]
