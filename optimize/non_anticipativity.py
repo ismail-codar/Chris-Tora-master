@@ -63,8 +63,8 @@ def _group_x_variables(
         product_specs: List[ProductSpec],
         solver,
 ):
-    start_scenario_index = number_of_scenarios_to_groups_together * cluster_index
-    end_scenario_index = start_scenario_index + number_of_scenarios_to_groups_together
+    start_scenario_index = int(number_of_scenarios_to_groups_together * cluster_index)
+    end_scenario_index = int(start_scenario_index + number_of_scenarios_to_groups_together)
 
     for v, vendor in enumerate(vendors):
         for d, delivery in enumerate(vendor.deliveries):
@@ -89,8 +89,8 @@ def _group_y_variables(
         product_specs: List[ProductSpec],
         solver,
 ):
-    start_scenario_index = number_of_scenarios_to_groups_together * cluster_index
-    end_scenario_index = start_scenario_index + number_of_scenarios_to_groups_together
+    start_scenario_index = int(number_of_scenarios_to_groups_together * cluster_index)
+    end_scenario_index = int(start_scenario_index + number_of_scenarios_to_groups_together)
 
     for c, customer in enumerate(customers):
         for o, order in enumerate(customer.orders):
