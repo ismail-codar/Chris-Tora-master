@@ -2,10 +2,14 @@ import timeit
 from dataclasses import dataclass
 from typing import List
 
+import solver as solver
+import xlwt
+
 from helpers import get_vendor_from_id, get_product_with_product_type, get_delivery_from_del_number
 from input_data.load_customers import Customer
 from input_data.load_vendors import load_vendors, Vendor
 from input_data.products import ProductSpec
+from optimize import variables
 from optimize.optimize import start_optimize, Action
 from profit import calculate_profit_for_current_start_day
 from scenarios.load_scenarios import Scenario
@@ -125,6 +129,7 @@ def run_simulation(
         profit_for_scenarios.append(total_profit_for_scenario)
         average_time_for_scenarios.append(average_time_for_scenario)
 
+
     average_run_time = sum(average_time_for_scenarios) / len(average_time_for_scenarios)
     print("Average run time: " + str(average_run_time))
     average_profit = sum(profit_for_scenarios) / len(profit_for_scenarios)
@@ -183,3 +188,4 @@ def update_delivery_volumes_after_todays_operations(vendors: List[Vendor], today
 
             product = get_product_with_product_type(products=delivery.supply, product_type=action.product_type)
             product.volume -= action.volume_delivered
+

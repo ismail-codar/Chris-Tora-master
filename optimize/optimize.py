@@ -11,7 +11,7 @@ from optimize.objective_function import create_objective_function
 from optimize.variables import create_variables_and_set_on_solver
 
 TERMINAL_COST = 10000
-FULL_ORDER = 864
+FULL_ORDER = 750
 PRINT_VARIABLE_RESULTS = False
 
 
@@ -79,7 +79,7 @@ def start_optimize(
     _verify_solution(result_status, solver)
 
     if PRINT_VARIABLE_RESULTS:
-        _print_solution_statistic(
+        print_solution_statistic(
             variables=variables,
             customers=customers,
             vendors=vendors,
@@ -158,7 +158,7 @@ def _get_actions(
     return all_actions
 
 
-def _print_solution_statistic(
+def print_solution_statistic(
     variables,
     customers,
     vendors,
@@ -205,10 +205,10 @@ def _print_solution_statistic(
         #                 if variables.d[v][d][c][o].solution_value() > -10:
         #                     print("d(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[v][d][c][o].solution_value()))
         #
-        for s in range(number_of_scenarios):
-            for v, vendor in enumerate(vendors):
-                for d, delivery in enumerate(vendor.deliveries):
-                    for c, customer in enumerate(customers):
-                        for o, order in enumerate(customer.orders):
-                            if variables.o[s][v][d][c][o].solution_value() > -1:
-                                print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[s][v][d][c][o].solution_value()))
+        # for s in range(number_of_scenarios):
+        #     for v, vendor in enumerate(vendors):
+        #         for d, delivery in enumerate(vendor.deliveries):
+        #             for c, customer in enumerate(customers):
+        #                 for o, order in enumerate(customer.orders):
+        #                     if variables.o[s][v][d][c][o].solution_value() > -1:
+        #                         print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[s][v][d][c][o].solution_value()))

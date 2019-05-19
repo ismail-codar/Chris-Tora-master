@@ -69,43 +69,43 @@ def load_product_spec():
         ProductSpec(
             product_type=ProductType.SALMON_1_2,
             customs_cost=60.0,
-            extra_cost=1347.0,
+            extra_cost=3347.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_1_2
         ),
         ProductSpec(
             product_type=ProductType.SALMON_2_3,
             customs_cost=60.0,
-            extra_cost=1487.0,
+            extra_cost=3487.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_2_3
         ),
         ProductSpec(
             product_type=ProductType.SALMON_3_4,
             customs_cost=60.0,
-            extra_cost=1334.0,
+            extra_cost=3334.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_3_4
         ),
         ProductSpec(
             product_type=ProductType.SALMON_4_5,
             customs_cost=60.0,
-            extra_cost=1653,
+            extra_cost=3653,
             average_deviation=AVERAGE_DEVIATION_SALMON_4_5,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_5_6,
             customs_cost=60.0,
-            extra_cost=1690.0,
+            extra_cost=3690.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_5_6,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_6_7,
             customs_cost=60.0,
-            extra_cost=1717.0,
+            extra_cost=3717.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_6_7,
         ),
         ProductSpec(
             product_type=ProductType.SALMON_7_8,
             customs_cost=60.0,
-            extra_cost=1725.0,
+            extra_cost=3725.0,
             average_deviation=AVERAGE_DEVIATION_SALMON_7_8,
         ),
         ProductSpec(
