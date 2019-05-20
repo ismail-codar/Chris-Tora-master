@@ -7,12 +7,11 @@ from scenarios.load_scenarios import load_scenarios
 
 from simulation.start_simulation import _filter_out_deliveries_after_end_time, \
     _filter_out_order_out_of_time_scope, run_simulation
+from solution_method import SolutionMethod
 
-STOCHASTIC = True
-ONE_PRODUCT_TYPE_AT_THE_TIME = True
+
 SIMULATE_RESULTS = True
-NUMBER_OF_SCENARIOS = 10
-NUMBER_OF_DAYS_IN_EACH_RUN = 2
+NUMBER_OF_SCENARIOS = 50
 START_DAY = 1
 END_DAY = 15
 ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
@@ -20,59 +19,87 @@ ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
 
 def start_run():
 
-    if STOCHASTIC and not ONE_PRODUCT_TYPE_AT_THE_TIME:
-        raise Exception("If you do a stochastic run, you can only do one product type at the time")
+    for test_index in range(4):
+        if test_index == 0:
+            NUMBER_OF_DAYS_IN_EACH_RUN = 2
+            SOLUTION_METHOD = SolutionMethod.STOCHASTIC
+            ONE_PRODUCT_TYPE_AT_THE_TIME = True
 
-    customers = load_customers()
-    product_specs = load_product_spec()
+        elif test_index == 1:
+            NUMBER_OF_DAYS_IN_EACH_RUN = 3
+            SOLUTION_METHOD = SolutionMethod.STOCHASTIC
+            ONE_PRODUCT_TYPE_AT_THE_TIME = True
 
-    if SIMULATE_RESULTS:
-        scenarios = load_scenarios(number_of_scenarios=NUMBER_OF_SCENARIOS)
-        number_of_runs_in_one_scenario = (END_DAY - START_DAY) - NUMBER_OF_DAYS_IN_EACH_RUN + 2
+        elif test_index == 2:
+            NUMBER_OF_DAYS_IN_EACH_RUN = 4
+            SOLUTION_METHOD = SolutionMethod.DETERMINISTIC
+            ONE_PRODUCT_TYPE_AT_THE_TIME = True
 
-        run_simulation(
-            customers=customers,
-            number_of_runs_in_one_scenario=number_of_runs_in_one_scenario,
-            product_specs=product_specs,
-            scenarios=scenarios,
-            start_day=START_DAY,
-            number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
-            stochastic=STOCHASTIC,
-            one_product_type_at_the_time=ONE_PRODUCT_TYPE_AT_THE_TIME,
-            adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
-        )
+        else:
+            NUMBER_OF_DAYS_IN_EACH_RUN = 5
+            SOLUTION_METHOD = SolutionMethod.DETERMINISTIC
+            ONE_PRODUCT_TYPE_AT_THE_TIME = False
 
-    else:
-        vendors = load_vendors(
-            path="input_data/deliveries.xlsx",
-            adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
-        )
-        start_day = START_DAY
-        end_day = start_day + NUMBER_OF_DAYS_IN_EACH_RUN
-        vendors_with_relevant_deliveries = _filter_out_deliveries_after_end_time(
-            vendors=vendors,
-            end_day=end_day,
-        )
-        customers_with_relevant_orders = _filter_out_order_out_of_time_scope(
-            customers=customers,
-            start_day=start_day,
-            end_day=end_day,
-        )
-        actions = start_optimize(
-            vendors=vendors_with_relevant_deliveries,
-            customers=customers_with_relevant_orders,
-            product_specs=product_specs,
-            stochastic=STOCHASTIC,
-            number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
-            start_day=start_day,
-        )
-        profit_for_start_day = calculate_profit_for_current_start_day(
-            vendors=vendors_with_relevant_deliveries,
-            customers=customers_with_relevant_orders,
-            product_specs=product_specs,
-            actions=actions,
-            start_day=start_day,
-        )
+        if SOLUTION_METHOD == SolutionMethod.STOCHASTIC and not ONE_PRODUCT_TYPE_AT_THE_TIME:
+            raise Exception("If you do a stochastic run, you can only do one product type at the time")
+
+
+        customers = load_customers()
+        product_specs = load_product_spec()
+
+        if SIMULATE_RESULTS:
+            scenarios = load_scenarios(number_of_scenarios=NUMBER_OF_SCENARIOS)
+            number_of_runs_in_one_scenario = (END_DAY - START_DAY) - NUMBER_OF_DAYS_IN_EACH_RUN + 2
+
+            run_simulation(
+                customers=customers,
+                number_of_runs_in_one_scenario=number_of_runs_in_one_scenario,
+                product_specs=product_specs,
+                scenarios=scenarios,
+                start_day=START_DAY,
+                number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
+                solution_method=SOLUTION_METHOD,
+                one_product_type_at_the_time=ONE_PRODUCT_TYPE_AT_THE_TIME,
+                adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
+                end_day=END_DAY,
+            )
+
+        else:
+            vendors = load_vendors(
+                path="input_data/deliveries.xlsx",
+                adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
+            )
+            start_day = START_DAY
+            end_day = start_day + NUMBER_OF_DAYS_IN_EACH_RUN
+            vendors_with_relevant_deliveries = _filter_out_deliveries_after_end_time(
+                vendors=vendors,
+                end_day=end_day,
+            )
+            customers_with_relevant_orders = _filter_out_order_out_of_time_scope(
+                customers=customers,
+                start_day=start_day,
+                end_day=end_day,
+            )
+            actions = start_optimize(
+                vendors=vendors_with_relevant_deliveries,
+                customers=customers_with_relevant_orders,
+                product_specs=product_specs,
+                solution_method=SOLUTION_METHOD,
+                number_of_days_in_each_run=NUMBER_OF_DAYS_IN_EACH_RUN,
+                start_day=start_day,
+            )
+            actions_with_transportation_date_today = [
+                action
+                for action in actions
+                if action.transportation_day == start_day
+            ]
+            profit_for_start_day = calculate_profit_for_current_start_day(
+                vendors=vendors_with_relevant_deliveries,
+                customers=customers_with_relevant_orders,
+                product_specs=product_specs,
+                todays_actions=actions_with_transportation_date_today,
+            )
+            print("Profit for start day: " + str(profit_for_start_day))
 
 
 start_run()

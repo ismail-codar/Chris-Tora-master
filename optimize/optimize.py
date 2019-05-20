@@ -9,6 +9,7 @@ from input_data.products import ProductSpec, ProductType
 from optimize.constraints import set_constraints
 from optimize.objective_function import create_objective_function
 from optimize.variables import create_variables_and_set_on_solver
+from solution_method import SolutionMethod
 
 TERMINAL_COST = 10000
 FULL_ORDER = 864
@@ -31,7 +32,7 @@ def start_optimize(
         vendors: List[Vendor],
         customers: List[Customer],
         product_specs: List[ProductSpec],
-        stochastic: bool,
+        solution_method: SolutionMethod,
         number_of_days_in_each_run: int,
         start_day: int,
 ):
@@ -40,7 +41,7 @@ def start_optimize(
         "SolveIntegerProblem", pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING
     )
 
-    if stochastic:
+    if solution_method.STOCHASTIC:
         number_of_scenarios = 3 ** (number_of_days_in_each_run - 1)
     else:
         number_of_scenarios = 1
@@ -86,7 +87,7 @@ def start_optimize(
             product_specs=product_specs,
             solver=solver,
             number_of_scenarios=number_of_scenarios,
-
+            current_start_day=start_day
         )
 
     actions = _get_actions(
@@ -165,6 +166,7 @@ def _print_solution_statistic(
     product_specs,
     solver,
     number_of_scenarios: int,
+    current_start_day,
 ):
     print("Objective value: " + str(solver.Objective().Value()))
     for s in range(number_of_scenarios):
@@ -173,7 +175,7 @@ def _print_solution_statistic(
                 for c, customer in enumerate(customers):
                     for o, order in enumerate(customer.orders):
                         for p, product in enumerate(product_specs):
-                            if variables.x[s][v][d][c][o][p].solution_value() > 0:
+                            if variables.x[s][v][d][c][o][p].solution_value() > 0 and order.departure_day == current_start_day:
                                 print("x(" +
                                       "_s" + str(s + 1) +
                                       "_v" + str(v + 1) +
@@ -186,7 +188,7 @@ def _print_solution_statistic(
         for c, customer in enumerate(customers):
             for o, order in enumerate(customer.orders):
                 for p, product in enumerate(product_specs):
-                    if variables.y[s][c][o][p].solution_value() > 0:
+                    if variables.y[s][c][o][p].solution_value() > 0 and order.departure_day == current_start_day:
                         print("y(s" + str(s + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "_p" + str(p + 1) + "): " + str(variables.y[s][c][o][p].solution_value()))
 
         # b_customer_index = 0
@@ -205,10 +207,10 @@ def _print_solution_statistic(
         #                 if variables.d[v][d][c][o].solution_value() > -10:
         #                     print("d(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.d[v][d][c][o].solution_value()))
         #
-        for s in range(number_of_scenarios):
-            for v, vendor in enumerate(vendors):
-                for d, delivery in enumerate(vendor.deliveries):
-                    for c, customer in enumerate(customers):
-                        for o, order in enumerate(customer.orders):
-                            if variables.o[s][v][d][c][o].solution_value() > -1:
-                                print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[s][v][d][c][o].solution_value()))
+        # for s in range(number_of_scenarios):
+        #     for v, vendor in enumerate(vendors):
+        #         for d, delivery in enumerate(vendor.deliveries):
+        #             for c, customer in enumerate(customers):
+        #                 for o, order in enumerate(customer.orders):
+        #                     if variables.o[s][v][d][c][o].solution_value() > -1:
+        #                         print("o(v" + str(v + 1) + "_d" + str(d + 1) + "_c" + str(c + 1) + "_o" + str(o + 1) + "): " + str(variables.o[s][v][d][c][o].solution_value()))
