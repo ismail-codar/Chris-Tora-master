@@ -12,24 +12,23 @@ from optimize.constraints import TERMINAL_COST, QUANTITY_FULL_ORDER
 
 def calculate_profit_for_current_start_day(
         customers: List[Customer],
-        start_day: int,
         vendors: List[Vendor],
         product_specs: List[ProductSpec],
-        actions: List[Action],
+        todays_actions: List[Action],
 ) -> float:
-
+    print("number of actions: " + str(len(todays_actions)))
     profit_for_realized_results = [
         _calculate_profit_for_one_action(
             action=action,
             customers=customers,
             product_specs=product_specs,
         )
-        for action in actions
-        if action.transportation_day == start_day
+        for action in todays_actions
     ]
+    print("profit_for_realized_results: " + str(sum(profit_for_realized_results)))
 
     oslo_terminal_costs = [
-        _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=actions)
+        _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=todays_actions)
         for vendor in vendors
         for delivery in vendor.deliveries
         for customer in customers

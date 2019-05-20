@@ -4,13 +4,14 @@ from input_data.load_customers import Customer, Order
 from input_data.load_vendors import Vendor, Delivery
 from input_data.products import ProductSpec, ProductType, Product
 from optimize.optimize import Action, start_optimize
+from solution_method import SolutionMethod
 
 
 def optimize_with_one_product_type_at_the_time(
     vendors: List[Vendor],
     customers: List[Customer],
     product_specs: List[ProductSpec],
-    stochastic: bool,
+    solution_method: SolutionMethod,
     number_of_days_in_each_run: int,
     start_day: int,
 ) -> List[Action]:
@@ -39,7 +40,7 @@ def optimize_with_one_product_type_at_the_time(
                 vendors=vendors_with_supply_only_for_current_product_type,
                 customers=customers_with_demand_only_for_current_product_type,
                 product_specs=[product_spec],
-                stochastic=stochastic,
+                solution_method=solution_method,
                 number_of_days_in_each_run=number_of_days_in_each_run,
                 start_day=start_day,
             )

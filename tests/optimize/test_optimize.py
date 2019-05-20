@@ -5,6 +5,7 @@ from input_data.load_customers import Customer, Order, TransportationCost
 from input_data.load_vendors import Vendor, Delivery
 from input_data.products import Product, ProductType, ProductSpec
 from optimize.optimize import start_optimize
+from solution_method import SolutionMethod
 
 
 class Optimize(TestCase):
@@ -65,7 +66,7 @@ class Optimize(TestCase):
             vendors=vendors,
             customers=customers,
             product_specs=product_specs,
-            stochastic=True,
+            solution_method=SolutionMethod.STOCHASTIC,
             number_of_days_in_each_run=2,
             start_day=0,
         )

@@ -1,6 +1,7 @@
-import timeit
+import time
 from dataclasses import dataclass
 from typing import List
+from openpyxl import load_workbook
 
 import solver as solver
 import xlwt
@@ -14,6 +15,7 @@ from optimize.optimize import start_optimize, Action
 from profit import calculate_profit_for_current_start_day
 from scenarios.load_scenarios import Scenario
 from simulation.stochastic import optimize_with_one_product_type_at_the_time
+from solution_method import SolutionMethod
 
 
 @dataclass(frozen=True)
@@ -30,14 +32,24 @@ def run_simulation(
         scenarios: List[Scenario],
         start_day: int,
         number_of_days_in_each_run: int,
-        stochastic: bool,
+        solution_method: SolutionMethod,
         one_product_type_at_the_time: bool,
         adjust_delivery_estimate: float,
+        end_day: float,
 ):
     profit_for_scenarios = []
     average_time_for_scenarios = []
 
+    sheet, workbook = _open_excel()
+
+    next_empty_row_in_excel_after_intro = _print_input_to_excel(adjust_delivery_estimate, end_day, number_of_days_in_each_run, one_product_type_at_the_time,
+                          sheet, start_day, solution_method.name)
+
     for scenario_index, scenario in enumerate(scenarios):
+        number_of_columns_in_each_scenario = 7
+        next_empty_row_in_excel = next_empty_row_in_excel_after_intro
+        next_empty_row_in_excel = _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, sheet, number_of_columns_in_each_scenario)
+
         print("Simulating over scenario " + str(scenario_index))
         vendors = load_vendors(
             path="input_data/deliveries.xlsx",
@@ -52,6 +64,8 @@ def run_simulation(
             print("Run number " + str(run_number) + " in scenario " + str(scenario_index))
             current_end_day = current_start_day + number_of_days_in_each_run - 1
             print("Optimize from day " + str(current_start_day) + " to day " + str(current_end_day))
+
+            sheet.cell(row=next_empty_row_in_excel, column=1 + number_of_columns_in_each_scenario * scenario_index).value = run_number
 
             update_todays_deliveries_based_on_actual_volume_in_scenario(
                 vendors=vendors,
@@ -75,13 +89,13 @@ def run_simulation(
             ])
             print("number of orders with delivery today: " + str(number_of_relevant_orders))
             if number_of_relevant_orders > 0:
-                start = timeit.timeit()
+                start_time = time.time()
                 if one_product_type_at_the_time:
                     actions = optimize_with_one_product_type_at_the_time(
                         vendors=vendors_with_relevant_deliveries_for_next_time_period,
                         customers=customers_with_relevant_orders_for_next_time_period,
                         product_specs=product_specs,
-                        stochastic=stochastic,
+                        solution_method=solution_method,
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
                     )
@@ -90,12 +104,12 @@ def run_simulation(
                         vendors=vendors_with_relevant_deliveries_for_next_time_period,
                         customers=customers_with_relevant_orders_for_next_time_period,
                         product_specs=product_specs,
-                        stochastic=stochastic,
+                        solution_method=solution_method,
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
                     )
-                end = timeit.timeit()
-                total_time = end - start
+                end_time = time.time()
+                total_time = end_time - start_time
                 print("Run time: " + str(total_time) + " sec")
                 running_times_for_scenario.append(total_time)
             else:
@@ -110,9 +124,14 @@ def run_simulation(
                 vendors=vendors,
                 customers=customers,
                 product_specs=product_specs,
-                actions=actions_with_transportation_date_today,
-                start_day=current_start_day,
+                todays_actions=actions_with_transportation_date_today,
             )
+            _print_run_results_to_excel(actions_with_transportation_date_today, current_start_day,
+                                        customers_with_relevant_orders_for_next_time_period, next_empty_row_in_excel,
+                                        number_of_columns_in_each_scenario, profit_from_todays_operation,
+                                        scenario_index, sheet, vendors_with_relevant_deliveries_for_next_time_period)
+            next_empty_row_in_excel += 1
+
             print("Profit from day " + str(current_start_day) + " = " + str(profit_from_todays_operation))
             profits_for_scenario.append(profit_from_todays_operation)
 
@@ -128,12 +147,102 @@ def run_simulation(
 
         profit_for_scenarios.append(total_profit_for_scenario)
         average_time_for_scenarios.append(average_time_for_scenario)
+    workbook.save("simulation/PythonEksport.xlsx")
 
 
     average_run_time = sum(average_time_for_scenarios) / len(average_time_for_scenarios)
     print("Average run time: " + str(average_run_time))
     average_profit = sum(profit_for_scenarios) / len(profit_for_scenarios)
     print("Average profit is: " + str(average_profit))
+
+
+def _print_run_results_to_excel(actions_with_transportation_date_today, current_start_day,
+                                customers_with_relevant_orders_for_next_time_period, next_empty_row_in_excel,
+                                number_of_columns_in_each_scenario, profit_from_todays_operation, scenario_index, sheet,
+                                vendors_with_relevant_deliveries_for_next_time_period):
+    x_value = sum([
+        action.volume_delivered
+        for action in actions_with_transportation_date_today
+        if action.internal_delivery
+    ])
+    y_value = sum([
+        action.volume_delivered
+        for action in actions_with_transportation_date_today
+        if not action.internal_delivery
+    ])
+    supply = sum([
+        product_supply.volume
+        for vendor in vendors_with_relevant_deliveries_for_next_time_period
+        for delivery in vendor.deliveries
+        if delivery.arrival_day <= current_start_day
+        for product_supply in delivery.supply
+    ])
+    demand = sum([
+        product_demand.volume
+        for customer in customers_with_relevant_orders_for_next_time_period
+        for order in customer.orders
+        if order.departure_day == current_start_day
+        for product_demand in order.demand
+    ])
+    sheet.cell(row=next_empty_row_in_excel,
+               column=2 + number_of_columns_in_each_scenario * scenario_index).value = profit_from_todays_operation
+    sheet.cell(row=next_empty_row_in_excel,
+               column=3 + number_of_columns_in_each_scenario * scenario_index).value = x_value
+    sheet.cell(row=next_empty_row_in_excel,
+               column=4 + number_of_columns_in_each_scenario * scenario_index).value = y_value
+    sheet.cell(row=next_empty_row_in_excel,
+               column=5 + number_of_columns_in_each_scenario * scenario_index).value = supply
+    sheet.cell(row=next_empty_row_in_excel,
+               column=6 + number_of_columns_in_each_scenario * scenario_index).value = demand
+
+
+def _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, sheet, number_of_columns_in_each_scenario):
+    sheet.cell(row=next_empty_row_in_excel,
+               column=1 + number_of_columns_in_each_scenario * scenario_index).value = "Scenario"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=2 + number_of_columns_in_each_scenario * scenario_index).value = scenario_index
+    next_empty_row_in_excel += 1
+    sheet.cell(row=next_empty_row_in_excel,
+               column=1 + number_of_columns_in_each_scenario * scenario_index).value = "Day"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=2 + number_of_columns_in_each_scenario * scenario_index).value = "Profit"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=3 + number_of_columns_in_each_scenario * scenario_index).value = "Internal X"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=4 + number_of_columns_in_each_scenario * scenario_index).value = "External Y"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=5 + number_of_columns_in_each_scenario * scenario_index).value = "Supply"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=6 + number_of_columns_in_each_scenario * scenario_index).value = "Demand"
+    next_empty_row_in_excel += 1
+    return next_empty_row_in_excel
+
+
+def _print_input_to_excel(adjust_delivery_estimate, end_day, number_of_days_in_each_run, one_product_type_at_the_time,
+                          sheet, start_day, stochastic):
+    sheet.cell(row=1, column=1).value = "Days in a run"
+    sheet.cell(row=1, column=2).value = number_of_days_in_each_run
+    sheet.cell(row=2, column=1).value = "Start day"
+    sheet.cell(row=2, column=2).value = start_day
+    sheet.cell(row=3, column=1).value = "End day"
+    sheet.cell(row=3, column=2).value = end_day
+    sheet.cell(row=4, column=1).value = "Stochastic"
+    sheet.cell(row=4, column=2).value = stochastic
+    sheet.cell(row=5, column=1).value = "One product at a time"
+    sheet.cell(row=5, column=2).value = one_product_type_at_the_time
+    sheet.cell(row=6, column=1).value = "adjust delivery estimate"
+    sheet.cell(row=6, column=2).value = adjust_delivery_estimate
+
+    return 8
+
+
+def _open_excel():
+    workbook = load_workbook("simulation/PythonEksport.xlsx")
+    workbook.create_sheet("New sheet")
+    sheets = workbook.sheetnames
+    number_of_sheets = len(sheets)
+    sheet = workbook[sheets[number_of_sheets - 1]]
+    return sheet, workbook
 
 
 def _filter_out_deliveries_after_end_time(vendors: List[Vendor], end_day: int) -> List[Vendor]:
