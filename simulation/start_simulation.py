@@ -2,15 +2,10 @@ import time
 from dataclasses import dataclass
 from typing import List
 from openpyxl import load_workbook
-
-import solver as solver
-import xlwt
-
 from helpers import get_vendor_from_id, get_product_with_product_type, get_delivery_from_del_number
 from input_data.load_customers import Customer
 from input_data.load_vendors import load_vendors, Vendor
 from input_data.products import ProductSpec
-from optimize import variables
 from optimize.optimize import start_optimize, Action
 from profit import calculate_profit_for_current_start_day
 from scenarios.load_scenarios import Scenario
