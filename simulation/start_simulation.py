@@ -1,4 +1,4 @@
-import timeit
+import time
 from dataclasses import dataclass
 from typing import List
 
@@ -71,7 +71,7 @@ def run_simulation(
             ])
             print("number of orders with delivery today: " + str(number_of_relevant_orders))
             if number_of_relevant_orders > 0:
-                start = timeit.timeit()
+                start_time = time.time()
                 if one_product_type_at_the_time:
                     actions = optimize_with_one_product_type_at_the_time(
                         vendors=vendors_with_relevant_deliveries_for_next_time_period,
@@ -90,8 +90,8 @@ def run_simulation(
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
                     )
-                end = timeit.timeit()
-                total_time = end - start
+                end_time = time.time()
+                total_time = end_time - start_time
                 print("Run time: " + str(total_time) + " sec")
                 running_times_for_scenario.append(total_time)
             else:
