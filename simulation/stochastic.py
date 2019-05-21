@@ -16,7 +16,7 @@ def optimize_with_one_product_type_at_the_time(
     start_day: int,
 ) -> List[Action]:
 
-    all_actions = []
+    all_actions: List[Action] = []
 
     for product_spec in product_specs:
 
@@ -25,17 +25,25 @@ def optimize_with_one_product_type_at_the_time(
         customers_with_demand_only_for_current_product_type = _filter_out_demand_for_other_product_types_from_customers(
             customers=customers, product_type=current_product_type,
         )
-        demand_for_current_product_type = [
-            demand
+        demand_volume = sum([
+            demand.volume
             for customer in customers_with_demand_only_for_current_product_type
             for order in customer.orders
             for demand in order.demand
-        ]
-        if len(demand_for_current_product_type) > 0:
+        ])
+        if len(customers_with_demand_only_for_current_product_type) > 0:
             print("Optimize for product" + str(product_spec.product_type.name))
             vendors_with_supply_only_for_current_product_type = _filter_out_supply_for_other_product_types_from_vendors(
                 vendors=vendors, product_type=current_product_type,
             )
+            supply_volume = sum([
+                supply.volume
+                for vendor in vendors_with_supply_only_for_current_product_type
+                for delivery in vendor.deliveries
+                for supply in delivery.supply
+            ])
+            print("Demand volume: " + str(demand_volume))
+            print("Supply volume: " + str(supply_volume))
             actions_for_current_product_type = start_optimize(
                 vendors=vendors_with_supply_only_for_current_product_type,
                 customers=customers_with_demand_only_for_current_product_type,

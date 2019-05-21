@@ -54,6 +54,8 @@ def start_optimize(
         number_of_scenarios=number_of_scenarios,
     )
 
+    print("Number of variables: " + str(solver.NumVariables()))
+
     set_constraints(
         vendors=vendors,
         customers=customers,
@@ -65,6 +67,7 @@ def start_optimize(
         start_day=start_day,
     )
 
+    print("Number of constraints: " + str(solver.NumConstraints()))
     objective = create_objective_function(
         solver=solver,
         variables=variables,
@@ -102,10 +105,10 @@ def start_optimize(
 def _verify_solution(result_status, solver):
     solution_is_verified = solver.VerifySolution(tolerance=0.001, log_errors=False)
     if result_status == pywraplp.Solver.OPTIMAL and solution_is_verified:
-        if PRINT_VARIABLE_RESULTS:
+        if True:
             print("Optimal solution found.")
     else:
-        if PRINT_VARIABLE_RESULTS:
+        if True:
             print("Optimal solution was not found.")
         if solution_is_verified:
             print("Using incumbent solution.")

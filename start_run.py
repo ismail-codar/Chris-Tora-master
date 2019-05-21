@@ -19,7 +19,7 @@ ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
 
 def start_run():
 
-    for test_index in range(4):
+    for test_index in range(3):
         if test_index == 0:
             NUMBER_OF_DAYS_IN_EACH_RUN = 3
             SOLUTION_METHOD = SolutionMethod.STOCHASTIC
@@ -37,7 +37,6 @@ def start_run():
 
         if SOLUTION_METHOD == SolutionMethod.STOCHASTIC and not ONE_PRODUCT_TYPE_AT_THE_TIME:
             raise Exception("If you do a stochastic run, you can only do one product type at the time")
-
 
         customers = load_customers()
         product_specs = load_product_spec()
