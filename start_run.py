@@ -11,7 +11,7 @@ from solution_method import SolutionMethod
 
 
 SIMULATE_RESULTS = True
-NUMBER_OF_SCENARIOS = 50
+NUMBER_OF_SCENARIOS = 10
 START_DAY = 1
 END_DAY = 15
 ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
@@ -21,18 +21,13 @@ def start_run():
 
     for test_index in range(4):
         if test_index == 0:
-            NUMBER_OF_DAYS_IN_EACH_RUN = 2
-            SOLUTION_METHOD = SolutionMethod.STOCHASTIC
-            ONE_PRODUCT_TYPE_AT_THE_TIME = True
-
-        elif test_index == 1:
             NUMBER_OF_DAYS_IN_EACH_RUN = 3
             SOLUTION_METHOD = SolutionMethod.STOCHASTIC
             ONE_PRODUCT_TYPE_AT_THE_TIME = True
 
-        elif test_index == 2:
-            NUMBER_OF_DAYS_IN_EACH_RUN = 4
-            SOLUTION_METHOD = SolutionMethod.DETERMINISTIC
+        elif test_index == 1:
+            NUMBER_OF_DAYS_IN_EACH_RUN = 2
+            SOLUTION_METHOD = SolutionMethod.STOCHASTIC
             ONE_PRODUCT_TYPE_AT_THE_TIME = True
 
         else:
