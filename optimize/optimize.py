@@ -80,7 +80,7 @@ def start_optimize(
         include_cross_docking=include_cross_docking,
     )
     objective.SetMaximization()
-    solver.SetTimeLimit(300000)  # milli sec
+    solver.SetTimeLimit(60000)  # milli sec - 60000 = 1 min
     result_status = solver.Solve()
     _verify_solution(result_status, solver)
 

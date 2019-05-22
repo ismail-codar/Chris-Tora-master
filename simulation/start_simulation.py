@@ -102,6 +102,7 @@ def run_simulation(
                         solution_method=solution_method,
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
+                        include_cross_docking=True,
                     )
                 end_time = time.time()
                 total_time = end_time - start_time
