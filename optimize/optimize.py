@@ -77,9 +77,11 @@ def start_optimize(
         number_of_scenarios=number_of_scenarios,
         number_of_days_in_one_run=number_of_days_in_each_run,
     )
+    print("objective created")
     objective.SetMaximization()
-    # solver.SetTimeLimit(60000)  # milli sec
+    solver.SetTimeLimit(60000)  # milli sec
     result_status = solver.Solve()
+    print("solved")
     _verify_solution(result_status, solver)
 
     if PRINT_VARIABLE_RESULTS:
