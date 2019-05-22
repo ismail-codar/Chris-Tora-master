@@ -60,7 +60,7 @@ def optimize_with_one_product_type_at_the_time(
 
 
 def _filter_out_demand_for_other_product_types_from_customers(customers: List[Customer], product_type: ProductType) -> List[Customer]:
-    customers_with_only_relevant_orders = [
+    customers_without_demand_for_other_product_types = [
         Customer(
             id=customer.id,
             orders=_filter_out_other_product_types_from_orders(
@@ -72,11 +72,16 @@ def _filter_out_demand_for_other_product_types_from_customers(customers: List[Cu
         )
         for customer in customers
     ]
-    return customers_with_only_relevant_orders
+    only_relevant_customers = [
+        customer
+        for customer in customers_without_demand_for_other_product_types
+        if len(customer.orders) > 0
+    ]
+    return only_relevant_customers
 
 
 def _filter_out_other_product_types_from_orders(orders: List[Order], product_type: ProductType) -> List[Order]:
-    orders_with_demand_only_for_product_type = [
+    orders_without_demand_for_other_product_types = [
         Order(
             departure_day=order.departure_day,
             demand=_filter_out_other_product_types(products=order.demand, product_type=product_type),
@@ -84,7 +89,12 @@ def _filter_out_other_product_types_from_orders(orders: List[Order], product_typ
         )
         for order in orders
     ]
-    return orders_with_demand_only_for_product_type
+    only_relevant_orders = [
+        order
+        for order in orders_without_demand_for_other_product_types
+        if len(order.demand) > 0
+    ]
+    return only_relevant_orders
 
 
 def _filter_out_other_product_types(products: List[Product], product_type: ProductType) -> List[Product]:
@@ -96,7 +106,7 @@ def _filter_out_other_product_types(products: List[Product], product_type: Produ
 
 
 def _filter_out_supply_for_other_product_types_from_vendors(vendors: List[Vendor], product_type: ProductType) -> List[Vendor]:
-    vendors_with_only_relevant_deliveries = [
+    vendors_without_supply_for_other_products = [
         Vendor(
             id=vendor.id,
             deliveries=_filter_out_other_product_types_from_deliveries(
@@ -106,11 +116,16 @@ def _filter_out_supply_for_other_product_types_from_vendors(vendors: List[Vendor
         )
         for vendor in vendors
     ]
-    return vendors_with_only_relevant_deliveries
+    only_relevant_vendors = [
+        vendor
+        for vendor in vendors_without_supply_for_other_products
+        if len(vendor.deliveries) > 0
+    ]
+    return only_relevant_vendors
 
 
 def _filter_out_other_product_types_from_deliveries(deliveries: List[Delivery], product_type: ProductType) -> List[Delivery]:
-    deliveries_with_supply_only_for_product_type = [
+    deliveries_without_supplies_for_other_products = [
         Delivery(
             supply=_filter_out_other_product_types(products=delivery.supply, product_type=product_type),
             arrival_day=delivery.arrival_day,
@@ -118,4 +133,10 @@ def _filter_out_other_product_types_from_deliveries(deliveries: List[Delivery], 
         )
         for delivery in deliveries
     ]
-    return deliveries_with_supply_only_for_product_type
+    only_relevant_deliveries = [
+        delivery
+        for delivery in deliveries_without_supplies_for_other_products
+        if len(delivery.supply) > 0
+    ]
+
+    return only_relevant_deliveries
