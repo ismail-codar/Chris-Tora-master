@@ -35,13 +35,14 @@ def start_optimize(
         solution_method: SolutionMethod,
         number_of_days_in_each_run: int,
         start_day: int,
+        include_cross_docking: bool,
 ):
 
     solver = pywraplp.Solver(
         "SolveIntegerProblem", pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING
     )
 
-    if solution_method.STOCHASTIC:
+    if solution_method == SolutionMethod.STOCHASTIC:
         number_of_scenarios = 3 ** (number_of_days_in_each_run - 1)
     else:
         number_of_scenarios = 1
@@ -54,7 +55,7 @@ def start_optimize(
         number_of_scenarios=number_of_scenarios,
     )
 
-    print("Number of variables: " + str(solver.NumVariables()))
+    # print("Number of variables: " + str(solver.NumVariables()))
 
     set_constraints(
         vendors=vendors,
@@ -67,7 +68,7 @@ def start_optimize(
         start_day=start_day,
     )
 
-    print("Number of constraints: " + str(solver.NumConstraints()))
+    # print("Number of constraints: " + str(solver.NumConstraints()))
     objective = create_objective_function(
         solver=solver,
         variables=variables,
@@ -76,12 +77,11 @@ def start_optimize(
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
         number_of_days_in_one_run=number_of_days_in_each_run,
+        include_cross_docking=include_cross_docking,
     )
-    print("objective created")
     objective.SetMaximization()
-    solver.SetTimeLimit(60000)  # milli sec
+    solver.SetTimeLimit(300000)  # milli sec
     result_status = solver.Solve()
-    print("solved")
     _verify_solution(result_status, solver)
 
     if PRINT_VARIABLE_RESULTS:
@@ -101,7 +101,8 @@ def start_optimize(
         vendors=vendors,
         product_specs=product_specs,
     )
-    return actions
+    objective_value = solver.Objective().Value()
+    return actions, objective_value
 
 
 def _verify_solution(result_status, solver):

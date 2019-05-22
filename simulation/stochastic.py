@@ -17,6 +17,7 @@ def optimize_with_one_product_type_at_the_time(
 ) -> List[Action]:
 
     all_actions: List[Action] = []
+    objective_value = 0
 
     for product_spec in product_specs:
 
@@ -44,19 +45,21 @@ def optimize_with_one_product_type_at_the_time(
             ])
             print("Demand volume: " + str(demand_volume))
             print("Supply volume: " + str(supply_volume))
-            actions_for_current_product_type = start_optimize(
+            actions_for_current_product_type, objective_value_for_run = start_optimize(
                 vendors=vendors_with_supply_only_for_current_product_type,
                 customers=customers_with_demand_only_for_current_product_type,
                 product_specs=[product_spec],
                 solution_method=solution_method,
                 number_of_days_in_each_run=number_of_days_in_each_run,
                 start_day=start_day,
+                include_cross_docking=False,
             )
+            objective_value += objective_value_for_run
         else:
             actions_for_current_product_type = []
         all_actions.extend(actions_for_current_product_type)
 
-    return all_actions
+    return all_actions, objective_value
 
 
 def _filter_out_demand_for_other_product_types_from_customers(customers: List[Customer], product_type: ProductType) -> List[Customer]:

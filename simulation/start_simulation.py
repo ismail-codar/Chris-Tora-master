@@ -7,7 +7,7 @@ from input_data.load_customers import Customer
 from input_data.load_vendors import load_vendors, Vendor
 from input_data.products import ProductSpec
 from optimize.optimize import start_optimize, Action
-from profit import calculate_profit_for_current_start_day
+from profit import calculate_profit
 from scenarios.load_scenarios import Scenario
 from simulation.stochastic import optimize_with_one_product_type_at_the_time
 from solution_method import SolutionMethod
@@ -86,7 +86,7 @@ def run_simulation(
             if number_of_relevant_orders > 0:
                 start_time = time.time()
                 if one_product_type_at_the_time:
-                    actions = optimize_with_one_product_type_at_the_time(
+                    actions, objective_value = optimize_with_one_product_type_at_the_time(
                         vendors=vendors_with_relevant_deliveries_for_next_time_period,
                         customers=customers_with_relevant_orders_for_next_time_period,
                         product_specs=product_specs,
@@ -95,7 +95,7 @@ def run_simulation(
                         start_day=start_day,
                     )
                 else:
-                    actions = start_optimize(
+                    actions, objective_value = start_optimize(
                         vendors=vendors_with_relevant_deliveries_for_next_time_period,
                         customers=customers_with_relevant_orders_for_next_time_period,
                         product_specs=product_specs,
@@ -115,7 +115,7 @@ def run_simulation(
                 for action in actions
                 if action.transportation_day == current_start_day
             ]
-            profit_from_todays_operation = calculate_profit_for_current_start_day(
+            profit_from_todays_operation = calculate_profit(
                 vendors=vendors,
                 customers=customers,
                 product_specs=product_specs,
@@ -142,13 +142,32 @@ def run_simulation(
 
         profit_for_scenarios.append(total_profit_for_scenario)
         average_time_for_scenarios.append(average_time_for_scenario)
-    workbook.save("simulation/PythonEksport.xlsx")
 
+        sheet.cell(row=next_empty_row_in_excel,
+                   column=1 + number_of_columns_in_each_scenario * scenario_index).value = "Total profit"
+        sheet.cell(row=next_empty_row_in_excel,
+                   column=2 + number_of_columns_in_each_scenario * scenario_index).value = total_profit_for_scenario
+        next_empty_row_in_excel += 1
+        sheet.cell(row=next_empty_row_in_excel,
+                   column=1 + number_of_columns_in_each_scenario * scenario_index).value = "Average time"
+        sheet.cell(row=next_empty_row_in_excel,
+                   column=2 + number_of_columns_in_each_scenario * scenario_index).value = average_time_for_scenario
+        next_empty_row_in_excel += 1
 
     average_run_time = sum(average_time_for_scenarios) / len(average_time_for_scenarios)
     print("Average run time: " + str(average_run_time))
     average_profit = sum(profit_for_scenarios) / len(profit_for_scenarios)
     print("Average profit is: " + str(average_profit))
+
+    next_empty_row_in_excel += 5
+
+    sheet.cell(row=next_empty_row_in_excel, column=1).value = "Average profit"
+    sheet.cell(row=next_empty_row_in_excel, column=2).value = average_profit
+    next_empty_row_in_excel += 1
+    sheet.cell(row=next_empty_row_in_excel, column=1).value = "Average run time"
+    sheet.cell(row=next_empty_row_in_excel, column=2).value = average_run_time
+
+    workbook.save("simulation/PythonEksport.xlsx")
 
 
 def _print_run_results_to_excel(actions_with_transportation_date_today, current_start_day,

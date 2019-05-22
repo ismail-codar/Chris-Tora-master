@@ -62,7 +62,7 @@ class Optimize(TestCase):
                 average_deviation=0.10,
             )
         ]
-        actions = start_optimize(
+        actions, _ = start_optimize(
             vendors=vendors,
             customers=customers,
             product_specs=product_specs,

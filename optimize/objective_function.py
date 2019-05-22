@@ -17,6 +17,7 @@ def create_objective_function(
         product_specs: List[ProductSpec],
         number_of_scenarios: int,
         number_of_days_in_one_run: int,
+        include_cross_docking: bool,
 ):
     objective = solver.Objective()
 
@@ -46,6 +47,7 @@ def create_objective_function(
         objective=objective,
         number_of_scenarios=number_of_scenarios,
         number_of_days_in_one_run=number_of_days_in_one_run,
+        include_cross_docking=include_cross_docking,
     )
 
     return objective
@@ -122,18 +124,19 @@ def _set_y_objective(y_vars, customers: List[Customer], product_specs: List[Prod
 
 
 # Oslo cost
-def _set_o_objective(customers, vendors, o_vars, objective, number_of_scenarios: int, number_of_days_in_one_run: int):
-    for s in range(number_of_scenarios):
-        for v, vendor in enumerate(vendors):
-            for d, delivery in enumerate(vendor.deliveries):
-                for c, customer in enumerate(customers):
-                    for o, order in enumerate(customer.orders):
-                        probability = _get_probability_of_scenario(
-                            scenario_index=s,
-                            number_of_scenarios=number_of_scenarios,
-                            number_of_days_in_one_run=number_of_days_in_one_run,
-                        )
-                        objective.SetCoefficient(o_vars[s][v][d][c][o], -1 * probability)
+def _set_o_objective(customers, vendors, o_vars, objective, number_of_scenarios: int, number_of_days_in_one_run: int, include_cross_docking: bool):
+    if include_cross_docking:
+        for s in range(number_of_scenarios):
+            for v, vendor in enumerate(vendors):
+                for d, delivery in enumerate(vendor.deliveries):
+                    for c, customer in enumerate(customers):
+                        for o, order in enumerate(customer.orders):
+                            probability = _get_probability_of_scenario(
+                                scenario_index=s,
+                                number_of_scenarios=number_of_scenarios,
+                                number_of_days_in_one_run=number_of_days_in_one_run,
+                            )
+                            objective.SetCoefficient(o_vars[s][v][d][c][o], -1 * probability)
 
 
 def _get_probability_of_scenario(
