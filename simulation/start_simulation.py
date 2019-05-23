@@ -31,11 +31,18 @@ def run_simulation(
         one_product_type_at_the_time: bool,
         adjust_delivery_estimate: float,
         time_horizon: int,
+        name: str,
 ):
     profit_for_scenarios = []
     average_time_for_scenarios = []
 
-    sheet, workbook = _open_excel()
+    if name == "Chris":
+        path = "simulation/ChrisResults.xlsx"
+    elif name == "Kristine":
+        path = "simulation/KristineResults.xlsx"
+    else:
+        raise Exception("Wrong name")
+    sheet, workbook = _open_excel(path)
 
     next_empty_row_in_excel_after_intro = _print_input_to_excel(adjust_delivery_estimate, time_horizon, number_of_days_in_each_run, one_product_type_at_the_time,
                           sheet, start_day, solution_method.name)
@@ -172,7 +179,7 @@ def run_simulation(
     sheet.cell(row=next_empty_row_in_excel, column=1).value = "Average run time"
     sheet.cell(row=next_empty_row_in_excel, column=2).value = average_run_time
 
-    workbook.save("simulation/PythonEksport.xlsx")
+    workbook.save(path)
 
 
 def _print_scenario_results_to_excel(average_time_for_scenario, next_empty_row_in_excel,
@@ -284,8 +291,8 @@ def _print_input_to_excel(adjust_delivery_estimate, time_horizon, number_of_days
     return 8
 
 
-def _open_excel():
-    workbook = load_workbook("simulation/PythonEksport.xlsx")
+def _open_excel(path: str):
+    workbook = load_workbook(path)
     workbook.create_sheet("New sheet")
     sheets = workbook.sheetnames
     number_of_sheets = len(sheets)

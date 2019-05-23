@@ -12,14 +12,15 @@ from simulation.stochastic import optimize_with_one_product_type_at_the_time
 from solution_method import SolutionMethod
 
 
-SIMULATE_RESULTS = False
+SIMULATE_RESULTS = True
 NUMBER_OF_SCENARIOS = 10
 START_DAY = 1
-TIME_HORIZON = 4
+TIME_HORIZON = 15
 ADJUST_DELIVERY_ESTIMATE = 0 # Percent, 0 % -> no change
-NUMBER_OF_DAYS_IN_EACH_RUN = 4
-SOLUTION_METHOD = SolutionMethod.PERFECT_INFORMATION
+#NUMBER_OF_DAYS_IN_EACH_RUN = 4
+SOLUTION_METHOD = SolutionMethod.STOCHASTIC
 ONE_PRODUCT_TYPE_AT_THE_TIME = True
+NAME = "Chris"
 
 
 def start_run():
@@ -29,11 +30,11 @@ def start_run():
     print("adjust delivery estimate: " + str(ADJUST_DELIVERY_ESTIMATE))
     print("Solution method: " + str(SOLUTION_METHOD.name))
     print("One product at the time: " + str(ONE_PRODUCT_TYPE_AT_THE_TIME))
-    print("number of days: " + str(NUMBER_OF_DAYS_IN_EACH_RUN))
 
-    for number_of_days in range(1):
+    for number_of_days in range(1, 5):
 
-        #NUMBER_OF_DAYS_IN_EACH_RUN = number_of_days
+        NUMBER_OF_DAYS_IN_EACH_RUN = number_of_days
+        print("number of days: " + str(NUMBER_OF_DAYS_IN_EACH_RUN))
 
         if SOLUTION_METHOD == SolutionMethod.STOCHASTIC and not ONE_PRODUCT_TYPE_AT_THE_TIME:
             raise Exception("If you do a stochastic run, you can only do one product type at the time")
@@ -55,6 +56,7 @@ def start_run():
                 one_product_type_at_the_time=ONE_PRODUCT_TYPE_AT_THE_TIME,
                 adjust_delivery_estimate=ADJUST_DELIVERY_ESTIMATE,
                 time_horizon=TIME_HORIZON,
+                name=NAME,
             )
 
         else:
