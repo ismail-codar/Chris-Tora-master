@@ -74,6 +74,7 @@ def start_optimize(
         number_of_scenarios=number_of_scenarios,
         number_of_days_in_one_run=number_of_days_in_each_run,
         start_day=start_day,
+        include_cross_docking=include_cross_docking,
     )
 
     # print("Number of constraints: " + str(solver.NumConstraints()))

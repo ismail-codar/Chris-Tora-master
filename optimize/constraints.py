@@ -25,6 +25,7 @@ def set_constraints(
         number_of_scenarios: int,
         number_of_days_in_one_run: int,
         start_day: int,
+        include_cross_docking: bool,
 ):
     _set_supply_and_demand_constraints(
         y_vars=variables.y,
@@ -47,16 +48,17 @@ def set_constraints(
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
     )
-    _set_cross_docking_constraint(
-        x_vars=variables.x,
-        d_vars=variables.d,
-        vendors=vendors,
-        product_specs=product_specs,
-        customers=customers,
-        solver=solver,
-        o_vars=variables.o,
-        number_of_scenarios=number_of_scenarios,
-    )
+    if include_cross_docking:
+        _set_cross_docking_constraint(
+            x_vars=variables.x,
+            d_vars=variables.d,
+            vendors=vendors,
+            product_specs=product_specs,
+            customers=customers,
+            solver=solver,
+            o_vars=variables.o,
+            number_of_scenarios=number_of_scenarios,
+        )
     _set_time_constraints(
         x_vars=variables.x,
         z_vars=variables.z,
