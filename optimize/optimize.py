@@ -28,6 +28,14 @@ class Action:
     transportation_day: int
 
 
+@dataclass(frozen=True)
+class OptimizeResults:
+    actions: List[Action]
+    objective_value: float
+    number_of_variables: float
+    number_of_constraints: float
+
+
 def start_optimize(
         vendors: List[Vendor],
         customers: List[Customer],
@@ -102,7 +110,13 @@ def start_optimize(
         product_specs=product_specs,
     )
     objective_value = solver.Objective().Value()
-    return actions, objective_value
+    optimize_results = OptimizeResults(
+        actions=actions,
+        objective_value=objective_value,
+        number_of_constraints=solver.NumConstraints(),
+        number_of_variables=solver.NumVariables(),
+    )
+    return optimize_results
 
 
 def _verify_solution(result_status, solver):

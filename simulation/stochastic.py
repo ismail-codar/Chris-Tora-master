@@ -3,7 +3,8 @@ from typing import List
 from input_data.load_customers import Customer, Order
 from input_data.load_vendors import Vendor, Delivery
 from input_data.products import ProductSpec, ProductType, Product
-from optimize.optimize import Action, start_optimize
+from optimize.optimize import Action, start_optimize, OptimizeResults
+from profit import _calculate_oslo_cost
 from solution_method import SolutionMethod
 
 
@@ -17,7 +18,9 @@ def optimize_with_one_product_type_at_the_time(
 ) -> List[Action]:
 
     all_actions: List[Action] = []
-    objective_value = 0
+    objective_value_without_terminal_cost = 0
+    number_of_constraints = 0
+    number_of_variables = 0
 
     for product_spec in product_specs:
 
@@ -45,7 +48,7 @@ def optimize_with_one_product_type_at_the_time(
             ])
             print("Demand volume: " + str(demand_volume))
             print("Supply volume: " + str(supply_volume))
-            actions_for_current_product_type, objective_value_for_run = start_optimize(
+            optimize_results_for_one_product = start_optimize(
                 vendors=vendors_with_supply_only_for_current_product_type,
                 customers=customers_with_demand_only_for_current_product_type,
                 product_specs=[product_spec],
@@ -54,12 +57,26 @@ def optimize_with_one_product_type_at_the_time(
                 start_day=start_day,
                 include_cross_docking=False,
             )
-            objective_value += objective_value_for_run
-        else:
-            actions_for_current_product_type = []
-        all_actions.extend(actions_for_current_product_type)
+            objective_value_without_terminal_cost += optimize_results_for_one_product.objective_value
+            all_actions.extend(optimize_results_for_one_product.actions)
+            number_of_constraints += optimize_results_for_one_product.number_of_constraints
+            number_of_variables += optimize_results_for_one_product.number_of_variables
 
-    return all_actions, objective_value
+    oslo_terminal_costs = sum([
+        _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=all_actions)
+        for vendor in vendors
+        for delivery in vendor.deliveries
+        for customer in customers
+        for order in customer.orders
+    ])
+    optimize_results = OptimizeResults(
+        actions=all_actions,
+        objective_value=objective_value_without_terminal_cost - oslo_terminal_costs,
+        number_of_variables=number_of_variables,
+        number_of_constraints=number_of_constraints,
+    )
+
+    return optimize_results
 
 
 def _filter_out_demand_for_other_product_types_from_customers(customers: List[Customer], product_type: ProductType) -> List[Customer]:
