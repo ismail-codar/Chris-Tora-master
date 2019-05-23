@@ -41,7 +41,7 @@ def run_simulation(
                           sheet, start_day, solution_method.name)
 
     for scenario_index, scenario in enumerate(scenarios):
-        number_of_columns_in_each_scenario = 7
+        number_of_columns_in_each_scenario = 10
         next_empty_row_in_excel = next_empty_row_in_excel_after_intro
         next_empty_row_in_excel = _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, sheet, number_of_columns_in_each_scenario)
 
@@ -120,10 +120,20 @@ def run_simulation(
                     product_specs=product_specs,
                     todays_actions=actions_with_transportation_date_today,
                 )
-                _print_run_results_to_excel(actions_with_transportation_date_today, current_start_day,
-                                            customers_with_relevant_orders_for_next_time_period, next_empty_row_in_excel,
-                                            number_of_columns_in_each_scenario, profit_from_todays_operation,
-                                            scenario_index, sheet, vendors_with_relevant_deliveries_for_next_time_period)
+                _print_run_results_to_excel(
+                    actions_with_transportation_date_today=actions_with_transportation_date_today,
+                    current_start_day=current_start_day,
+                    customers_with_relevant_orders_for_next_time_period=customers_with_relevant_orders_for_next_time_period,
+                    next_empty_row_in_excel=next_empty_row_in_excel,
+                    number_of_columns_in_each_scenario=number_of_columns_in_each_scenario,
+                    profit_from_todays_operation=profit_from_todays_operation,
+                    scenario_index=scenario_index,
+                    sheet=sheet,
+                    vendors_with_relevant_deliveries_for_next_time_period=vendors_with_relevant_deliveries_for_next_time_period,
+                    number_of_variables=optimize_results.number_of_variables,
+                    number_of_constraints=optimize_results.number_of_constraints,
+                    time=total_time,
+                )
                 next_empty_row_in_excel += 1
 
                 print("Profit from day " + str(current_start_day) + " = " + str(profit_from_todays_operation))
@@ -181,7 +191,8 @@ def _print_scenario_results_to_excel(average_time_for_scenario, next_empty_row_i
 def _print_run_results_to_excel(actions_with_transportation_date_today, current_start_day,
                                 customers_with_relevant_orders_for_next_time_period, next_empty_row_in_excel,
                                 number_of_columns_in_each_scenario, profit_from_todays_operation, scenario_index, sheet,
-                                vendors_with_relevant_deliveries_for_next_time_period):
+                                vendors_with_relevant_deliveries_for_next_time_period, number_of_variables,
+                                number_of_constraints, time):
     x_value = sum([
         action.volume_delivered
         for action in actions_with_transportation_date_today
@@ -216,7 +227,13 @@ def _print_run_results_to_excel(actions_with_transportation_date_today, current_
                column=5 + number_of_columns_in_each_scenario * scenario_index).value = supply
     sheet.cell(row=next_empty_row_in_excel,
                column=6 + number_of_columns_in_each_scenario * scenario_index).value = demand
-
+    sheet.cell(row=next_empty_row_in_excel,
+               column=7 + number_of_columns_in_each_scenario * scenario_index).value = time
+    sheet.cell(row=next_empty_row_in_excel,
+               column=8 + number_of_columns_in_each_scenario * scenario_index).value = number_of_variables
+    sheet.cell(row=next_empty_row_in_excel,
+               column=9 + number_of_columns_in_each_scenario * scenario_index).value = number_of_constraints
+    
 
 def _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, sheet, number_of_columns_in_each_scenario):
     sheet.cell(row=next_empty_row_in_excel,
@@ -236,6 +253,12 @@ def _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, she
                column=5 + number_of_columns_in_each_scenario * scenario_index).value = "Supply"
     sheet.cell(row=next_empty_row_in_excel,
                column=6 + number_of_columns_in_each_scenario * scenario_index).value = "Demand"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=7 + number_of_columns_in_each_scenario * scenario_index).value = "Time"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=8 + number_of_columns_in_each_scenario * scenario_index).value = "Nr variables"
+    sheet.cell(row=next_empty_row_in_excel,
+               column=9 + number_of_columns_in_each_scenario * scenario_index).value = "Nr constraints"
     next_empty_row_in_excel += 1
     return next_empty_row_in_excel
 
