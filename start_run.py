@@ -5,7 +5,6 @@ from input_data.load_customers import load_customers, Customer
 from input_data.load_vendors import load_vendors, Vendor
 from input_data.products import load_product_spec, ProductSpec
 from optimize.optimize import start_optimize
-from profit import _calculate_oslo_cost
 from scenarios.load_scenarios import load_scenarios
 
 from simulation.start_simulation import _filter_out_order_out_of_time_scope, run_simulation
@@ -99,6 +98,7 @@ def _run_one_optimization(
             solution_method=SOLUTION_METHOD,
             number_of_days_in_each_run=number_of_days_in_each_run,
             start_day=start_day,
+            simulation=False,
         )
     else:
         optimize_results = start_optimize(
@@ -109,6 +109,7 @@ def _run_one_optimization(
             number_of_days_in_each_run=number_of_days_in_each_run,
             start_day=start_day,
             include_cross_docking=True,
+            simulation=False,
         )
     print("Objective value: " + str(optimize_results.objective_value))
     end_time = time.time()

@@ -44,13 +44,14 @@ def start_optimize(
         number_of_days_in_each_run: int,
         start_day: int,
         include_cross_docking: bool,
+        simulation: bool,
 ):
 
     solver = pywraplp.Solver(
         "SolveIntegerProblem", pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING
     )
 
-    if solution_method == SolutionMethod.STOCHASTIC:
+    if solution_method == SolutionMethod.STOCHASTIC or solution_method == SolutionMethod.PERFECT_INFORMATION and simulation:
         number_of_scenarios = 3 ** (number_of_days_in_each_run - 1)
     else:
         number_of_scenarios = 1
@@ -74,6 +75,7 @@ def start_optimize(
         number_of_scenarios=number_of_scenarios,
         number_of_days_in_one_run=number_of_days_in_each_run,
         start_day=start_day,
+        solution_method=solution_method,
         include_cross_docking=include_cross_docking,
     )
 

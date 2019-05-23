@@ -10,6 +10,7 @@ from input_data.products import ProductSpec, ProductType, Product
 from optimize.non_anticipativity import set_non_anticipativity_constraints
 from optimize.variables import Variables
 from helpers import get_transport_price_from_vendor_v, get_average_percentage_deviation
+from solution_method import SolutionMethod
 
 M = 1000000
 QUANTITY_FULL_ORDER = 750
@@ -25,6 +26,7 @@ def set_constraints(
         number_of_scenarios: int,
         number_of_days_in_one_run: int,
         start_day: int,
+        solution_method: SolutionMethod,
         include_cross_docking: bool,
 ):
     _set_supply_and_demand_constraints(
@@ -77,7 +79,7 @@ def set_constraints(
         product_specs=product_specs,
         number_of_scenarios=number_of_scenarios,
     )
-    if number_of_scenarios > 1:
+    if number_of_scenarios > 1 and solution_method != SolutionMethod.PERFECT_INFORMATION:
         set_non_anticipativity_constraints(
             variables=variables,
             number_of_days_in_one_run=number_of_days_in_one_run,

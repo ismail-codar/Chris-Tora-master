@@ -15,6 +15,7 @@ def optimize_with_one_product_type_at_the_time(
     solution_method: SolutionMethod,
     number_of_days_in_each_run: int,
     start_day: int,
+    simulation: bool,
 ) -> List[Action]:
 
     all_actions: List[Action] = []
@@ -56,6 +57,7 @@ def optimize_with_one_product_type_at_the_time(
                 number_of_days_in_each_run=number_of_days_in_each_run,
                 start_day=start_day,
                 include_cross_docking=False,
+                simulation=simulation,
             )
             objective_value_without_terminal_cost += optimize_results_for_one_product.objective_value
             all_actions.extend(optimize_results_for_one_product.actions)

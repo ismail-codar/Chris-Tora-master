@@ -62,10 +62,11 @@ def run_simulation(
 
             sheet.cell(row=next_empty_row_in_excel, column=1 + number_of_columns_in_each_scenario * scenario_index).value = run_number
 
-            update_todays_deliveries_based_on_actual_volume_in_scenario(
+            update_deliveries_based_on_actual_volume_in_scenario(
                 vendors=vendors,
                 scenario=scenario,
                 current_day=current_start_day,
+                solution_method=solution_method,
             )
             vendors_with_relevant_deliveries_for_next_time_period = _filter_out_deliveries_after_end_time(
                 vendors=vendors,
@@ -93,6 +94,7 @@ def run_simulation(
                         solution_method=solution_method,
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
+                        simulation=True,
                     )
                 else:
                     optimize_results = start_optimize(
@@ -103,6 +105,7 @@ def run_simulation(
                         number_of_days_in_each_run=number_of_days_in_each_run,
                         start_day=start_day,
                         include_cross_docking=True,
+                        simulation=True,
                     )
                 end_time = time.time()
                 total_time = end_time - start_time
@@ -233,7 +236,7 @@ def _print_run_results_to_excel(actions_with_transportation_date_today, current_
                column=8 + number_of_columns_in_each_scenario * scenario_index).value = number_of_variables
     sheet.cell(row=next_empty_row_in_excel,
                column=9 + number_of_columns_in_each_scenario * scenario_index).value = number_of_constraints
-    
+
 
 def _print_scenario_header_to_excel(next_empty_row_in_excel, scenario_index, sheet, number_of_columns_in_each_scenario):
     sheet.cell(row=next_empty_row_in_excel,
@@ -324,14 +327,19 @@ def _filter_out_order_out_of_time_scope(customers: List[Customer], start_day: in
     return customer_with_only_relevant_deliveries
 
 
-def update_todays_deliveries_based_on_actual_volume_in_scenario(vendors: List[Vendor], scenario: Scenario, current_day: int):
+def update_deliveries_based_on_actual_volume_in_scenario(vendors: List[Vendor], scenario: Scenario, current_day: int, solution_method: SolutionMethod):
     for product_outcome in scenario.product_outcomes:
         vendor = get_vendor_from_id(vendors=vendors, vendor_id=product_outcome.vendor_id)
         delivery = get_delivery_from_del_number(deliveries=vendor.deliveries, delivery_number=product_outcome.delivery_number)
-        if delivery.arrival_day == current_day:
+        if solution_method == SolutionMethod.PERFECT_INFORMATION:
             product_type = product_outcome.product_type
             product = get_product_with_product_type(products=delivery.supply, product_type=product_type)
             product.volume = product_outcome.actual_volume
+        else:
+            if delivery.arrival_day == current_day:
+                product_type = product_outcome.product_type
+                product = get_product_with_product_type(products=delivery.supply, product_type=product_type)
+                product.volume = product_outcome.actual_volume
 
 
 def update_delivery_volumes_after_todays_operations(vendors: List[Vendor], todays_actions: List[Action]):
