@@ -51,7 +51,7 @@ def start_optimize(
         "SolveIntegerProblem", pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING
     )
 
-    if solution_method == SolutionMethod.STOCHASTIC or solution_method == SolutionMethod.PERFECT_INFORMATION and simulation:
+    if solution_method == SolutionMethod.STOCHASTIC or solution_method == SolutionMethod.PERFECT_INFORMATION and not simulation:
         number_of_scenarios = 3 ** (number_of_days_in_each_run - 1)
     else:
         number_of_scenarios = 1

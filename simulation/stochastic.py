@@ -64,13 +64,16 @@ def optimize_with_one_product_type_at_the_time(
             number_of_constraints += optimize_results_for_one_product.number_of_constraints
             number_of_variables += optimize_results_for_one_product.number_of_variables
 
-    oslo_terminal_costs = sum([
-        _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=all_actions)
-        for vendor in vendors
-        for delivery in vendor.deliveries
-        for customer in customers
-        for order in customer.orders
-    ])
+    if simulation:
+        oslo_terminal_costs = sum([
+            _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=all_actions)
+            for vendor in vendors
+            for delivery in vendor.deliveries
+            for customer in customers
+            for order in customer.orders
+        ])
+    else:
+        oslo_terminal_costs = 0
     optimize_results = OptimizeResults(
         actions=all_actions,
         objective_value=objective_value_without_terminal_cost - oslo_terminal_costs,

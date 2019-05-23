@@ -16,7 +16,6 @@ def calculate_profit(
         product_specs: List[ProductSpec],
         todays_actions: List[Action],
 ) -> float:
-    print("number of actions: " + str(len(todays_actions)))
     profit_for_realized_results = [
         _calculate_profit_for_one_action(
             action=action,
@@ -25,7 +24,6 @@ def calculate_profit(
         )
         for action in todays_actions
     ]
-    print("profit_for_realized_results: " + str(sum(profit_for_realized_results)))
 
     oslo_terminal_costs = [
         _calculate_oslo_cost(vendor=vendor, delivery=delivery, order=order, actions=todays_actions)
